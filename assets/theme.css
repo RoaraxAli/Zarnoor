@@ -1839,8 +1839,10 @@ input, select, textarea, button { border-radius: 8px; }
 
 /* Contact page */
 .contact-page { max-width: 1120px; padding-top: 36px; }
-.contact-page > .breadcrumbs { margin-bottom: 58px; }
-.contact-page__intro { max-width: 650px; margin: 0 auto 58px; background: #5b1020; color: #fff; text-align: center; }
+.contact-page__hero { margin: -36px calc(-1 * var(--pad)) 58px; padding: 36px var(--pad) 0; background: #5b1020; color: #fff; }
+.contact-page__hero .breadcrumbs { margin-bottom: 58px; color: rgba(255, 255, 255, .8); }
+.contact-page__hero .breadcrumbs a { color: #fff; }
+.contact-page__intro { max-width: 650px; margin: 0 auto; background: transparent; color: #fff; text-align: center; }
 .contact-page__eyebrow { margin-bottom: 12px; color: rgba(255, 255, 255, .72); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; }
 .contact-page__intro h1 { margin-bottom: 14px; color: #fff; }
 .contact-page__intro > p:last-child { max-width: 520px; margin: 0 auto; color: #fff; font-size: 13px; line-height: 1.8; }
@@ -1866,8 +1868,8 @@ input, select, textarea, button { border-radius: 8px; }
 .contact-form__errors { background: #fbf1ef; color: #7c2c24; }
 @media (max-width: 700px) {
   .contact-page { padding-top: 26px; padding-bottom: 56px; }
-  .contact-page > .breadcrumbs { margin-bottom: 40px; }
-  .contact-page__intro { margin-bottom: 38px; }
+  .contact-page__hero { margin-top: -26px; margin-bottom: 38px; padding-top: 26px; }
+  .contact-page__hero .breadcrumbs { margin-bottom: 40px; }
   .contact-page__layout { grid-template-columns: 1fr; gap: 30px; padding-top: 28px; }
   .contact-page__details { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 16px; }
   .contact-page__note { grid-column: 1 / -1; max-width: none; margin: 0; }
