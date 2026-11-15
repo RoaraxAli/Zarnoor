@@ -1036,7 +1036,8 @@ input, select, textarea, button { border-radius: 8px; }
   justify-content: space-between;
   gap: 16px;
   padding: 16px var(--pad);
-  border-bottom: 1px solid var(--line);
+  background: #f6edef;
+  border-bottom: 2px solid var(--accent);
 }
 .drawer-logo-img { width: 78px; height: auto; }
 
@@ -1071,8 +1072,8 @@ input, select, textarea, button { border-radius: 8px; }
 }
 .menu-accordion summary::-webkit-details-marker { display: none; }
 .sidebar-link:hover,
-.menu-accordion summary:hover { background: var(--soft); }
-.menu-accordion[open] > summary { background: var(--soft); }
+.menu-accordion summary:hover { background: #f6edef; color: var(--accent); }
+.menu-accordion[open] > summary { background: #f6edef; color: var(--accent); }
 .menu-accordion summary::after {
   content: '+';
   font-size: 15px;
@@ -1106,7 +1107,7 @@ input, select, textarea, button { border-radius: 8px; }
   font-size: 9px;
   letter-spacing: .2em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--accent);
 }
 
 .menu-products { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 4px var(--pad) 14px; }
