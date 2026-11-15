@@ -1,8 +1,25 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero_banner": {
       "type": "hero-banner",
       "blocks": {
+        "slide_W98dqT": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/Sangeet_Collection.jpg",
+            "alt": "Zarnoor campaign",
+            "link": ""
+          }
+        },
         "slide_AMMF4G": {
           "type": "slide",
           "settings": {
@@ -13,28 +30,34 @@
         },
         "slide_aHejUb": {
           "type": "slide",
+          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/Luxury_Pret.jpg",
-            "alt": "Zarnoor campaign",
-            "link": ""
-          }
-        },
-        "slide_W98dqT": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/Sangeet_Collection.jpg",
             "alt": "Zarnoor campaign",
             "link": ""
           }
         }
       },
       "block_order": [
+        "slide_W98dqT",
         "slide_AMMF4G",
-        "slide_aHejUb",
-        "slide_W98dqT"
+        "slide_aHejUb"
       ],
       "custom_css": [],
       "settings": {}
+    },
+    "best_sellers": {
+      "type": "best-sellers",
+      "settings": {
+        "eyebrow": "Customer favourites",
+        "title": "Best sellers",
+        "collection": "best-seller",
+        "tag": "best-seller",
+        "products_to_show": 8,
+        "show_view_all": true,
+        "empty_heading": "Best sellers are coming soon",
+        "empty_text": "Add the best-seller tag to products to feature them here."
+      }
     },
     "shop_by_edit": {
       "type": "shop-by-edit",
@@ -55,19 +78,6 @@
         "products_to_show": 8,
         "empty_heading": "No pieces yet",
         "empty_text": "Choose a collection in the theme editor to show pieces here."
-      }
-    },
-    "best_sellers": {
-      "type": "best-sellers",
-      "settings": {
-        "eyebrow": "Customer favourites",
-        "title": "Best sellers",
-        "collection": "best-seller",
-        "tag": "best-seller",
-        "products_to_show": 8,
-        "show_view_all": true,
-        "empty_heading": "Best sellers are coming soon",
-        "empty_text": "Add the best-seller tag to products to feature them here."
       }
     }
   },
