@@ -25,6 +25,7 @@
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/The_Mehfil_Edit_26.jpg",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-11-15_at_20.51.36.jpg",
             "alt": "Zarnoor campaign",
             "link": ""
           }
@@ -33,6 +34,7 @@
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/Luxury_Pret.jpg",
+            "mobile_image": "shopify://shop_images/lux_pret.jpg",
             "alt": "Zarnoor campaign",
             "link": ""
           }
