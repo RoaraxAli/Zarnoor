@@ -25,6 +25,21 @@
 
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
+/* Quiet black scrollbar to match the storefront's editorial styling. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #242321 #f3f1ed;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f3f1ed; }
+::-webkit-scrollbar-thumb {
+  background: #242321;
+  border: 2px solid #f3f1ed;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover { background: #090909; }
+
 body {
   margin: 0;
   background: var(--paper);
