@@ -25,21 +25,6 @@
 
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
-/* Quiet black scrollbar to match the storefront's editorial styling. */
-html {
-  scrollbar-width: thin;
-  scrollbar-color: #242321 #f3f1ed;
-}
-
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #f3f1ed; }
-::-webkit-scrollbar-thumb {
-  background: #242321;
-  border: 2px solid #f3f1ed;
-  border-radius: 8px;
-}
-::-webkit-scrollbar-thumb:hover { background: #090909; }
-
 body {
   margin: 0;
   background: var(--paper);
@@ -67,18 +52,18 @@ svg { display: block; }
 /* ---------- Storefront scrollbar ---------- */
 html {
   scrollbar-width: thin;
-  scrollbar-color: var(--accent) var(--soft);
+  scrollbar-color: #171717 #f3f1ed;
 }
 
-::-webkit-scrollbar { width: 9px; height: 9px; }
-::-webkit-scrollbar-track { background: var(--soft); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f3f1ed; }
 ::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border: 2px solid var(--soft);
-  border-radius: 0;
+  background: #171717;
+  border: 2px solid #f3f1ed;
+  border-radius: 8px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--ink); }
-::-webkit-scrollbar-corner { background: var(--soft); }
+::-webkit-scrollbar-thumb:hover { background: #050505; }
+::-webkit-scrollbar-corner { background: #f3f1ed; }
 
 .skip-link {
   position: absolute;
