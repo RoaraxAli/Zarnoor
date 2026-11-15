@@ -32,9 +32,6 @@
               <img src="{{ c.products.first.featured_image | image_url: width: 800 }}" alt="{{ c.title | escape }}" loading="lazy" width="800" height="1200">
             {%- endif -%}
           {%- endif -%}
-          {%- if block.settings.eyebrow != blank -%}
-            <span class="edit-card-index">{{ block.settings.eyebrow }}</span>
-          {%- endif -%}
           <span class="edit-card-title">{{ block.settings.title | default: block.settings.collection.title }}</span>
           {%- if block.settings.cta != blank -%}
             <span class="edit-card-cta">{{ block.settings.cta }} <b>→</b></span>
@@ -53,7 +50,6 @@
           {%- elsif collection.products.first.featured_image -%}
             <img src="{{ collection.products.first.featured_image | image_url: width: 800 }}" alt="{{ collection.title | escape }}" loading="lazy" width="800" height="1200">
           {%- endif -%}
-          <span class="edit-card-index">{{ forloop.index | prepend: '0' }} — {{ collection.all_products_count }} pieces</span>
           <span class="edit-card-title">{{ collection.title }}</span>
           <span class="edit-card-cta">Shop {{ collection.title | downcase }} <b>→</b></span>
         </a>
