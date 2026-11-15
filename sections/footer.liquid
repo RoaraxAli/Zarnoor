@@ -30,6 +30,16 @@
         {%- endif -%}
       </div>
 
+      <nav class="footer-col footer-explore-col" aria-label="Explore">
+        <h5 class="footer-heading">Explore</h5>
+        <ul class="footer-links">
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          <li><a href="{{ routes.all_products_collection_url }}">Shop all</a></li>
+          {%- if pages.faq != blank -%}<li><a href="{{ pages.faq.url }}">FAQs</a></li>{%- endif -%}
+          {%- if pages.contact != blank -%}<li><a href="{{ pages.contact.url }}">Contact</a></li>{%- endif -%}
+        </ul>
+      </nav>
+
       {%- for block in section.blocks -%}
         {%- case block.type -%}
           {%- when 'menu' -%}
