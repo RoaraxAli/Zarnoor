@@ -3,12 +3,14 @@
     <div class="footer-grid">
       <div class="footer-col footer-brand-col">
         {% render 'zarnoor-logo' %}
-        {%- if section.settings.brand_sub != blank -%}
-          <span class="footer-brand-sub">{{ section.settings.brand_sub }}</span>
-        {%- endif -%}
-        {%- if section.settings.brand_description != blank -%}
-          <p class="footer-brand-desc">{{ section.settings.brand_description }}</p>
-        {%- endif -%}
+        <div class="footer-brand-copy">
+          {%- if section.settings.brand_sub != blank -%}
+            <span class="footer-brand-sub">{{ section.settings.brand_sub }}</span>
+          {%- endif -%}
+          {%- if section.settings.brand_description != blank -%}
+            <p class="footer-brand-desc">{{ section.settings.brand_description }}</p>
+          {%- endif -%}
+        </div>
         {%- if section.settings.show_contact -%}
           <div class="footer-direct-contact">
             {%- if section.settings.contact_label != blank -%}
