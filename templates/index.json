@@ -61,7 +61,7 @@
     "shop_by_edit": {
       "type": "shop-by-edit",
       "settings": {
-        "eyebrow": "Shop by category",
+        "eyebrow": "Shop by Collection",
         "title": "Find your kind of beautiful.",
         "link_label": "All collections",
         "link_url": "",
