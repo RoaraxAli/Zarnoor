@@ -1425,10 +1425,10 @@ input, select, textarea, button { border-radius: 8px; }
 /* ---------- Footer ---------- */
 
 .site-footer { border-top: 1px solid var(--line); background: var(--soft); }
-.footer-container { max-width: var(--max); margin: 0 auto; padding: clamp(48px, 6vw, 84px) var(--pad) 0; }
+.footer-container { width: 100%; max-width: none; margin: 0 auto; padding: clamp(48px, 6vw, 84px) clamp(var(--pad), 6vw, 96px) 0; }
 .footer-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(24px, 4vw, 56px);
   padding-bottom: clamp(38px, 5vw, 64px);
 }
