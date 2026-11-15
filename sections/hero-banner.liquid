@@ -5,16 +5,25 @@
         {%- if block.settings.image != blank -%}
           <div class="hero-carousel-slide{% if forloop.first %} is-active{% endif %}" data-hero-slide{% unless forloop.first %} aria-hidden="true"{% endunless %} {{ block.shopify_attributes }}>
             {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" class="hero-carousel-link">{%- endif -%}
-            <img
-              class="hero-carousel-image"
-              src="{{ block.settings.image | image_url: width: 2400 }}"
-              srcset="{{ block.settings.image | image_url: width: 800 }} 800w, {{ block.settings.image | image_url: width: 1200 }} 1200w, {{ block.settings.image | image_url: width: 1974 }} 1974w"
-              sizes="100vw"
-              alt="{{ block.settings.alt | escape }}"
-              width="{{ block.settings.image.width }}"
-              height="{{ block.settings.image.height }}"
-              {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
-            >
+            <picture class="hero-carousel-media{% if block.settings.mobile_image != blank %} has-mobile-image{% endif %}">
+              {%- if block.settings.mobile_image != blank -%}
+                <source
+                  media="(max-width: 749px)"
+                  srcset="{{ block.settings.mobile_image | image_url: width: 480 }} 480w, {{ block.settings.mobile_image | image_url: width: 750 }} 750w, {{ block.settings.mobile_image | image_url: width: 1100 }} 1100w"
+                  sizes="100vw"
+                >
+              {%- endif -%}
+              <img
+                class="hero-carousel-image"
+                src="{{ block.settings.image | image_url: width: 2400 }}"
+                srcset="{{ block.settings.image | image_url: width: 800 }} 800w, {{ block.settings.image | image_url: width: 1200 }} 1200w, {{ block.settings.image | image_url: width: 1974 }} 1974w"
+                sizes="100vw"
+                alt="{{ block.settings.alt | escape }}"
+                width="{{ block.settings.image.width }}"
+                height="{{ block.settings.image.height }}"
+                {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+              >
+            </picture>
             {%- if block.settings.link != blank -%}</a>{%- endif -%}
           </div>
         {%- endif -%}
@@ -49,6 +58,7 @@
       "name": "Banner slide",
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Banner image" },
+        { "type": "image_picker", "id": "mobile_image", "label": "Mobile banner image (optional)" },
         { "type": "text", "id": "alt", "label": "Alt text", "default": "Zarnoor campaign" },
         { "type": "url", "id": "link", "label": "Link (optional)" }
       ]
