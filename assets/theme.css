@@ -49,6 +49,22 @@ svg { display: block; }
 
 ::selection { background: var(--accent); color: #fff; }
 
+/* ---------- Storefront scrollbar ---------- */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--soft);
+}
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: var(--soft); }
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border: 2px solid var(--soft);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--ink); }
+::-webkit-scrollbar-corner { background: var(--soft); }
+
 .skip-link {
   position: absolute;
   left: 16px;
