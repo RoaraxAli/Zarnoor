@@ -19,7 +19,14 @@
   <div class="best-sellers-track" data-best-sellers-track aria-label="Best selling products">
     {%- paginate best_seller_collection.products by 250 -%}
       {%- for product in best_seller_collection.products -%}
-        {%- if product.tags contains best_seller_tag -%}
+        {%- assign product_tag_match = false -%}
+        {%- for product_tag in product.tags -%}
+          {%- assign normalized_product_tag = product_tag | downcase | strip -%}
+          {%- if normalized_product_tag == best_seller_tag -%}
+            {%- assign product_tag_match = true -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if product_tag_match -%}
           <div class="best-sellers-slide">{% render 'product-card', product: product, index: rendered_count | plus: 1 %}</div>
           {%- assign rendered_count = rendered_count | plus: 1 -%}
           {%- if rendered_count >= product_limit -%}{%- break -%}{%- endif -%}

@@ -56,10 +56,24 @@
         "empty_heading": "No pieces yet",
         "empty_text": "Choose a collection in the theme editor to show pieces here."
       }
+    },
+    "best_sellers": {
+      "type": "best-sellers",
+      "settings": {
+        "eyebrow": "Customer favourites",
+        "title": "Best sellers",
+        "collection": "",
+        "tag": "best-seller",
+        "products_to_show": 4,
+        "show_view_all": true,
+        "empty_heading": "Best sellers are coming soon",
+        "empty_text": "Add the best-seller tag to products to feature them here."
+      }
     }
   },
   "order": [
     "hero_banner",
+    "best_sellers",
     "shop_by_edit",
     "featured_products"
   ]
