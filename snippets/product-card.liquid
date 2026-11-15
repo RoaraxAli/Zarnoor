@@ -1,0 +1,110 @@
+{%- comment -%}
+  Product card
+  Accepts: product, index (for the cover fallback)
+{%- endcomment -%}
+
+{%- assign card_index = index | default: 1 -%}
+{%- assign fallback_pick = card_index | minus: 1 | modulo: 2 | plus: 1 -%}
+{%- assign fallback_cover = 'editorial-0' | append: fallback_pick | append: '.jpg' -%}
+{%- assign fabric = product.metafields.custom.fabric.value | default: product.type | default: 'Zarnoor' -%}
+{%- assign price_plain = product.price | money_without_currency | strip | replace: '.00', '' -%}
+{%- assign compare_plain = product.compare_at_price | money_without_currency | strip | replace: '.00', '' -%}
+{%- assign sold_out = false -%}
+{%- unless product.available -%}{%- assign sold_out = true -%}{%- endunless -%}
+
+<article class="product-card" data-product-card>
+  <div class="card-media">
+    <a href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+      {%- if product.featured_image -%}
+        <img
+          class="card-img--main"
+          src="{{ product.featured_image | image_url: width: 700 }}"
+          srcset="{{ product.featured_image | image_url: width: 350 }} 350w, {{ product.featured_image | image_url: width: 500 }} 500w, {{ product.featured_image | image_url: width: 700 }} 700w, {{ product.featured_image | image_url: width: 1000 }} 1000w"
+          sizes="(max-width: 749px) 50vw, 25vw"
+          alt="{{ product.featured_image.alt | default: product.title | escape }}"
+          width="{{ product.featured_image.width }}"
+          height="{{ product.featured_image.height }}"
+          loading="lazy"
+        >
+        {%- if product.images.size > 1 -%}
+          <img
+            class="card-img--alt"
+            src="{{ product.images[1] | image_url: width: 700 }}"
+            alt=""
+            width="{{ product.images[1].width }}"
+            height="{{ product.images[1].height }}"
+            loading="lazy"
+            aria-hidden="true"
+          >
+        {%- endif -%}
+      {%- else -%}
+        <span class="card-media--fallback" style="position:absolute;inset:0;display:flex;">
+          <span class="card-fallback-mark">{{ fabric }}<span>Zarnoor</span></span>
+        </span>
+      {%- endif -%}
+    </a>
+
+    {%- if product.compare_at_price > product.price -%}
+      {%- assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+      <span class="badge-sale">−{{ savings }}%</span>
+    {%- elsif sold_out -%}
+      <span class="badge-sale">Sold out</span>
+    {%- endif -%}
+
+    <button
+      type="button"
+      class="wishlist-btn"
+      data-wishlist
+      aria-label="Save {{ product.title | escape }}"
+      data-handle="{{ product.handle }}"
+      data-title="{{ product.title | escape }}"
+      data-url="{{ product.url }}"
+      data-price="{{ price_plain }}"
+      data-image="{% if product.featured_image %}{{ product.featured_image | image_url: width: 300 }}{% else %}{{ fallback_cover | asset_url }}{% endif %}"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.5s-7.5-4.6-7.5-9.6a4.1 4.1 0 017.5-2.4 4.1 4.1 0 017.5 2.4c0 5-7.5 9.6-7.5 9.6z"/></svg>
+    </button>
+
+    {%- unless sold_out -%}
+      <div class="quick-add-overlay">
+        <div class="quick-action-row">
+          <button
+            type="button"
+            class="btn-quick-add"
+            data-quick-add
+            data-title="{{ product.title | escape }}"
+            data-url="{{ product.url }}"
+            data-price="{{ price_plain }}"
+            data-compare="{% if product.compare_at_price > product.price %}{{ compare_plain }}{% endif %}"
+            data-image="{% if product.featured_image %}{{ product.featured_image | image_url: width: 700 }}{% else %}{{ fallback_cover | asset_url }}{% endif %}"
+            data-variants="{{ product.variants | json | escape }}"
+            data-description="{{ product.description | strip_html | truncate: 140 | escape }}"
+            data-option-name="{{ product.options.first | escape }}"
+            data-option-count="{{ product.options.size }}"
+          >
+            + Quick add
+          </button>
+        </div>
+      </div>
+    {%- else -%}
+      <div class="quick-add-overlay">
+        <div class="quick-action-row">
+          <a class="btn-quick-add" href="{{ product.url }}" style="display:flex;align-items:center;justify-content:center;">View piece</a>
+        </div>
+      </div>
+    {%- endunless -%}
+  </div>
+
+  <div class="product-meta">
+    <span class="card-fabric">{{ fabric }}</span>
+    <h3 class="card-title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+    <div class="card-price">
+      {%- if product.compare_at_price > product.price -%}
+        <ins>PKR {{ price_plain }}</ins>
+        <del>PKR {{ compare_plain }}</del>
+      {%- else -%}
+        <span>PKR {{ price_plain }}</span>
+      {%- endif -%}
+    </div>
+  </div>
+</article>

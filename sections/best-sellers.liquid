@@ -1,0 +1,101 @@
+{%- assign best_seller_collection = section.settings.collection | default: collections['all'] -%}
+{%- assign best_seller_tag = section.settings.tag | default: 'best-seller' | downcase | strip -%}
+{%- assign product_limit = section.settings.products_to_show | default: 4 -%}
+
+<section id="best-sellers" class="section-products best-sellers-carousel" data-best-sellers-carousel>
+  <div class="section-header">
+    <div class="section-header-title-block">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="section-eyebrow">{{ section.settings.eyebrow }}</span>
+      {%- endif -%}
+      <h2 class="section-title">{{ section.settings.title | default: 'Best sellers' }}</h2>
+    </div>
+    {%- if section.settings.show_view_all -%}
+      <a class="editorial-link" href="{{ best_seller_collection.url | default: '/collections/all' }}">View all</a>
+    {%- endif -%}
+  </div>
+
+  {%- assign rendered_count = 0 -%}
+  <div class="best-sellers-track" data-best-sellers-track aria-label="Best selling products">
+    {%- paginate best_seller_collection.products by 250 -%}
+      {%- for product in best_seller_collection.products -%}
+        {%- if product.tags contains best_seller_tag -%}
+          <div class="best-sellers-slide">{% render 'product-card', product: product, index: rendered_count | plus: 1 %}</div>
+          {%- assign rendered_count = rendered_count | plus: 1 -%}
+          {%- if rendered_count >= product_limit -%}{%- break -%}{%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endpaginate -%}
+  </div>
+
+  {%- if rendered_count > 1 -%}
+    <div class="best-sellers-controls" aria-label="Best sellers carousel controls">
+      <button type="button" data-best-sellers-prev aria-label="Previous products">←</button>
+      <button type="button" data-best-sellers-next aria-label="Next products">→</button>
+    </div>
+  {%- endif -%}
+
+  {%- if rendered_count == 0 -%}
+    <div class="empty-state">
+      <h2>{{ section.settings.empty_heading | default: 'Best sellers are coming soon' }}</h2>
+      <p>{{ section.settings.empty_text | default: 'Add the best-seller tag to products to feature them here.' }}</p>
+    </div>
+  {%- endif -%}
+</section>
+
+<style>
+  #best-sellers .best-sellers-track { display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; scroll-behavior:smooth; }
+  #best-sellers .best-sellers-track::-webkit-scrollbar { display:none; }
+  #best-sellers .best-sellers-slide { flex:0 0 calc(50% - 8px); min-width:0; scroll-snap-align:start; }
+  #best-sellers .product-card { width:100%; }
+  #best-sellers .best-sellers-controls { display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
+  #best-sellers .best-sellers-controls button { width:38px; height:38px; border:1px solid var(--line-strong); font-size:20px; }
+  #best-sellers .best-sellers-controls button:hover { color:var(--accent); border-color:var(--accent); }
+  @media (min-width:750px) { #best-sellers .best-sellers-slide { flex-basis:calc(33.333% - 11px); } }
+  @media (prefers-reduced-motion:reduce) { #best-sellers .best-sellers-track { scroll-behavior:auto; } }
+</style>
+<script>
+  (() => {
+    const carousel = document.querySelector('[data-best-sellers-carousel]');
+    if (!carousel || carousel.dataset.carouselReady) return;
+    carousel.dataset.carouselReady = 'true';
+    const track = carousel.querySelector('[data-best-sellers-track]');
+    const slides = Array.from(track.querySelectorAll('.best-sellers-slide'));
+    if (slides.length < 2) return;
+    let timer;
+    let index = 0;
+    const move = (step) => {
+      index = (index + step + slides.length) % slides.length;
+      track.scrollTo({ left: slides[index].offsetLeft - slides[0].offsetLeft, behavior: 'smooth' });
+    };
+    const stop = () => clearInterval(timer);
+    const start = () => {
+      stop();
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) timer = setInterval(() => move(1), 3500);
+    };
+    carousel.querySelector('[data-best-sellers-prev]')?.addEventListener('click', () => { move(-1); start(); });
+    carousel.querySelector('[data-best-sellers-next]')?.addEventListener('click', () => { move(1); start(); });
+    carousel.addEventListener('mouseenter', stop);
+    carousel.addEventListener('mouseleave', start);
+    carousel.addEventListener('focusin', stop);
+    carousel.addEventListener('focusout', (event) => { if (!carousel.contains(event.relatedTarget)) start(); });
+    start();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Best sellers",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Customer favourites" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Best sellers" },
+    { "type": "collection", "id": "collection", "label": "Product source collection", "info": "Leave blank to check all products." },
+    { "type": "text", "id": "tag", "label": "Product tag", "default": "best-seller" },
+    { "type": "range", "id": "products_to_show", "min": 2, "max": 8, "step": 2, "default": 4, "label": "Products to show" },
+    { "type": "checkbox", "id": "show_view_all", "label": "Show View all link", "default": true },
+    { "type": "text", "id": "empty_heading", "label": "Empty state heading", "default": "Best sellers are coming soon" },
+    { "type": "textarea", "id": "empty_text", "label": "Empty state text", "default": "Add the best-seller tag to products to feature them here." }
+  ],
+  "presets": [{ "name": "Best sellers" }]
+}
+{% endschema %}

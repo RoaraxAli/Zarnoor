@@ -1,0 +1,45 @@
+<div id="search-modal-overlay" class="drawer-overlay" aria-hidden="true"></div>
+
+<aside id="search-drawer" class="search-drawer" aria-label="Search" aria-hidden="true">
+  <div class="search-drawer-inner">
+    <div class="search-drawer-header">
+      <span class="search-brand-label">Search</span>
+      <button id="search-close-btn" class="drawer-close-btn" type="button" aria-label="Close search">×</button>
+    </div>
+
+    <form action="{{ routes.search_url }}" method="get" class="search-drawer-form" role="search">
+      <div class="search-input-wrap">
+        <svg class="search-icon-lg" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.6-4.6M17.5 10.5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input
+          type="search"
+          name="q"
+          id="search-input-field"
+          class="search-input-field"
+          placeholder="Search pieces, fabrics or codes"
+          autocomplete="off"
+          aria-label="Search products"
+        >
+        <button type="button" id="search-clear-btn" class="search-clear-btn" style="display: none;" aria-label="Clear search">×</button>
+      </div>
+    </form>
+
+    <div class="trending-searches" id="trending-searches-box">
+      <span class="trending-label">Popular right now</span>
+      <div class="trending-tags">
+        <button type="button" class="trending-tag" onclick="fillSearch('organza')">Organza</button>
+        <button type="button" class="trending-tag" onclick="fillSearch('khaddar')">Khaddar</button>
+        <button type="button" class="trending-tag" onclick="fillSearch('silk')">Silk</button>
+        <button type="button" class="trending-tag" onclick="fillSearch('embroidered')">Embroidered</button>
+        <button type="button" class="trending-tag" onclick="fillSearch('kaftan')">Kaftan</button>
+      </div>
+    </div>
+
+    <div class="predictive-results-container" id="predictive-results-box" style="display: none;">
+      <h5 class="results-heading">Pieces</h5>
+      <div class="predictive-results-grid" id="predictive-results-list"></div>
+      <div class="view-all-results" id="view-all-results-wrap" style="display: none;">
+        <a href="{{ routes.search_url }}" id="view-all-search-link" class="btn btn--outline btn--block">View all results</a>
+      </div>
+    </div>
+  </div>
+</aside>

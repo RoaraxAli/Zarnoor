@@ -1,0 +1,69 @@
+<div id="mobile-drawer-overlay" class="drawer-overlay" aria-hidden="true"></div>
+
+<aside id="mobile-sidebar" class="mobile-sidebar" aria-label="Menu" aria-hidden="true">
+  <div class="sidebar-header">
+    {% render 'zarnoor-logo' %}
+    <button id="sidebar-close-btn" class="drawer-close-btn" type="button" aria-label="Close menu">×</button>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Store pages">
+    {%- assign main_menu = linklists.main-menu -%}
+    {%- if main_menu.links.size > 0 -%}
+      {%- for link in main_menu.links -%}
+        {%- if link.links.size > 0 -%}
+          <details class="menu-accordion">
+            <summary>
+              <span>{{ link.title }}</span>
+            </summary>
+            <div class="menu-sub">
+              <a href="{{ link.url }}">View all {{ link.title | downcase }}</a>
+              {%- for child in link.links -%}
+                <a href="{{ child.url }}">{{ child.title }}</a>
+              {%- endfor -%}
+            </div>
+          </details>
+        {%- else -%}
+          <a class="sidebar-link{% if link.title contains 'Sale' %} text-sale{% endif %}" href="{{ link.url }}">{{ link.title }}</a>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- else -%}
+      <a class="sidebar-link" href="/collections/new-in">New in</a>
+      <a class="sidebar-link" href="/collections/ready-to-wear">Ready to wear</a>
+      <a class="sidebar-link" href="/collections/unstitched">Unstitched</a>
+      <a class="sidebar-link" href="/collections/luxury-pret">Luxury pret</a>
+      <a class="sidebar-link text-sale" href="/collections/sale">Sale</a>
+    {%- endif -%}
+
+    {%- assign shown_collections = 0 -%}
+    {%- capture collection_links -%}
+      {%- for collection in collections -%}
+        {%- if collection.all_products_count > 0 and collection.handle != 'frontpage' -%}
+          <a href="{{ collection.url }}">{{ collection.title }} <span style="color:#a49a8e;">({{ collection.all_products_count }})</span></a>
+          {%- assign shown_collections = shown_collections | plus: 1 -%}
+          {%- if shown_collections >= 10 -%}{%- break -%}{%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if collection_links != blank -%}
+      <div class="sidebar-group-label">Shop by category</div>
+      <div class="menu-sub">{{ collection_links }}</div>
+    {%- endif -%}
+
+    {%- if settings.order_tracking_url != blank -%}
+      <a class="sidebar-link" href="{{ settings.order_tracking_url }}">Track your order</a>
+    {%- endif -%}
+    <button type="button" class="sidebar-link" id="sidebar-wishlist-btn" style="width:100%;text-align:left;">{{ settings.wishlist_label | default: 'Saved pieces' }}</button>
+
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-socials">
+      {% if settings.instagram_url != blank %}<a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
+      {% if settings.facebook_url != blank %}<a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a>{% endif %}
+      {% if settings.tiktok_url != blank %}<a href="{{ settings.tiktok_url }}" target="_blank" rel="noopener">TikTok</a>{% endif %}
+    </div>
+    <div class="sidebar-contact">
+      {%- if settings.contact_email != blank -%}<a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a>{%- endif -%}
+    </div>
+  </div>
+</aside>

@@ -1,0 +1,10 @@
+<div class="page-shell" style="max-width:520px;">
+  <h1>Activate account</h1>
+  {% form 'activate_customer_password' %}
+    {% if form.errors %}<div class="form-error">{{ form.errors | default_errors }}</div>{% endif %}
+    <div class="form-field"><label for="activate_password">Password</label><input type="password" name="customer[password]" id="activate_password" autocomplete="new-password" required></div>
+    <div class="form-field"><label for="activate_password_confirmation">Confirm password</label><input type="password" name="customer[password_confirmation]" id="activate_password_confirmation" autocomplete="new-password" required></div>
+    <button type="submit" class="btn btn-primary btn--block">Activate account</button>
+    <div class="form-links"><a href="{{ routes.account_login_url }}">Cancel</a></div>
+  {% endform %}
+</div>

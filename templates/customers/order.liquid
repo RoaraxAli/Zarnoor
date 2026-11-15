@@ -1,0 +1,26 @@
+<div class="page-shell">
+  <nav class="breadcrumbs" style="margin-bottom:16px;">
+    <a href="{{ routes.account_url }}">Account</a>
+    <span aria-hidden="true">/</span>
+    <span>{{ order.name }}</span>
+  </nav>
+
+  <h1>{{ order.name }}</h1>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:24px;">
+    Placed {{ order.created_at | date: '%d %B %Y' }} · {{ order.financial_status_label }} · {{ order.fulfillment_status_label }}
+  </p>
+
+  <div style="border-top:1px solid var(--line);">
+    {% for line_item in order.line_items %}
+      <div style="display:flex;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);font-size:12px;">
+        <span>{{ line_item.quantity }} × {{ line_item.title }}{% if line_item.variant.title != 'Default Title' %} — {{ line_item.variant.title }}{% endif %}</span>
+        <span>{{ line_item.final_line_price | money }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="summary-row total" style="margin-top:20px;"><span>Total</span><span>{{ order.total_price | money }}</span></div>
+
+  <h2 style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin:28px 0 10px;">Delivery address</h2>
+  <p style="font-size:12px;line-height:1.8;color:var(--muted);">{{ order.shipping_address | format_address }}</p>
+</div>

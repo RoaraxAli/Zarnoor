@@ -1,0 +1,87 @@
+{%- assign threshold = settings.free_shipping_threshold | default: 0 -%}
+{%- assign cart_rupees = cart.total_price | divided_by: 100 -%}
+{%- if threshold > 0 -%}
+  {%- assign progress = cart_rupees | times: 100 | divided_by: threshold -%}
+  {%- if progress > 100 -%}{%- assign progress = 100 -%}{%- endif -%}
+{%- else -%}
+  {%- assign progress = 100 -%}
+{%- endif -%}
+
+<div id="cart-drawer-overlay" class="drawer-overlay" aria-hidden="true"></div>
+
+<aside id="cart-drawer" class="cart-drawer" aria-label="Shopping bag" aria-hidden="true">
+  <div class="cart-drawer-header">
+    <div class="cart-header-title">
+      <h3>Your bag</h3>
+      <span id="cart-drawer-count" class="cart-count-pill">{{ cart.item_count }}</span>
+    </div>
+    <button id="cart-close-btn" class="drawer-close-btn" type="button" aria-label="Close bag">×</button>
+  </div>
+
+  <div class="free-shipping-bar">
+    <span id="shipping-progress-text">
+      {%- if threshold > 0 -%}
+        {%- if cart_rupees >= threshold -%}
+          Free delivery unlocked
+        {%- else -%}
+          PKR {{ threshold | minus: cart_rupees }} away from free delivery
+        {%- endif -%}
+      {%- endif -%}
+    </span>
+    <div class="shipping-progress-bg">
+      <div id="shipping-progress-bar" class="shipping-progress-fill" style="width: {{ progress }}%;"></div>
+    </div>
+  </div>
+
+  <div id="cart-items-container" class="cart-items-body">
+    {%- if cart.items.size == 0 -%}
+      <div class="cart-empty">
+        <p class="cart-empty-title">Your bag is empty</p>
+        <p>Add a piece to begin.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="btn btn--outline" onclick="closeCartDrawer()">Shop all</a>
+      </div>
+    {%- else -%}
+      {%- for item in cart.items -%}
+        <div class="cart-item" data-line="{{ forloop.index }}">
+          <a href="{{ item.url }}">
+            {%- if item.image -%}
+              <img src="{{ item.image | image_url: width: 200 }}" alt="{{ item.product_title | escape }}" width="74" height="100" loading="lazy">
+            {%- else -%}
+              <span class="card-media card-media--fallback" style="width:74px;height:100px;display:flex;padding:6px;">
+                <span class="card-fallback-mark" style="font-size:9px;">{{ item.product_title | slice: 0, 12 }}</span>
+              </span>
+            {%- endif -%}
+          </a>
+          <div class="cart-item-info">
+            <a href="{{ item.url }}"><h5 class="cart-item-title">{{ item.product_title }}</h5></a>
+            {%- if item.variant.title != 'Default Title' -%}
+              <span class="cart-item-meta">{{ item.variant.title }}</span>
+            {%- endif -%}
+            {%- if item.sku != blank -%}
+              <span class="cart-item-meta">Code: {{ item.sku }}</span>
+            {%- endif -%}
+            <span class="cart-item-price">{{ item.final_line_price | money }}</span>
+            <button type="button" class="cart-item-remove" data-cart-remove="{{ forloop.index }}">Remove</button>
+          </div>
+          <div class="cart-item-qty">
+            <button type="button" class="qty-btn" data-cart-qty data-line="{{ forloop.index }}" data-quantity="{{ item.quantity | minus: 1 }}" aria-label="Decrease quantity">−</button>
+            <span class="qty-num">{{ item.quantity }}</span>
+            <button type="button" class="qty-btn" data-cart-qty data-line="{{ forloop.index }}" data-quantity="{{ item.quantity | plus: 1 }}" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+
+  <div class="cart-drawer-footer">
+    <div class="cart-subtotal-row">
+      <span>Subtotal</span>
+      <span id="cart-subtotal-price" class="cart-subtotal-price">{{ cart.total_price | money }}</span>
+    </div>
+    <p class="cart-taxes-note">Taxes included.</p>
+    <a href="/checkout" class="btn btn--block btn-checkout">Checkout</a>
+    <button type="button" class="btn btn--block btn-cart-whatsapp" onclick="checkoutViaWhatsApp()">Order on WhatsApp</button>
+    <a href="{{ routes.cart_url }}" class="btn-continue-shopping">View bag</a>
+    <a href="{{ routes.all_products_collection_url }}" class="btn-continue-shopping" onclick="closeCartDrawer()">Continue shopping</a>
+  </div>
+</aside>

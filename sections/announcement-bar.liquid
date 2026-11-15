@@ -1,0 +1,35 @@
+<div class="announcement-bar-wrapper">
+  <div class="announcement-bar-inner">
+    <div class="announcement-item announcement-center">
+      <span>{{ settings.announcement_text | default: 'Free nationwide delivery · Cash on delivery available' }}</span>
+    </div>
+    <div class="announcement-links">
+      {% assign l1_url = settings.announcement_link_1_url | default: settings.order_tracking_url | default: routes.account_url %}
+      {% assign l2_url = settings.announcement_link_2_url | default: routes.search_url %}
+      {% assign l3_url = settings.announcement_link_3_url | default: routes.account_url %}
+      {% if settings.announcement_link_1_label != blank %}
+        <a href="{{ l1_url }}">{{ settings.announcement_link_1_label }}</a>
+      {% endif %}
+      {% if settings.announcement_link_2_label != blank %}
+        <a href="{{ l2_url }}">{{ settings.announcement_link_2_label }}</a>
+      {% endif %}
+      {% if settings.announcement_link_3_label != blank %}
+        <a href="{{ l3_url }}">{{ settings.announcement_link_3_label }}</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "settings": [
+    { "type": "text", "id": "announcement_link_1_label", "label": "Link 1 label", "default": "Track order" },
+    { "type": "url", "id": "announcement_link_1_url", "label": "Link 1 URL" },
+    { "type": "text", "id": "announcement_link_2_label", "label": "Link 2 label", "default": "Search" },
+    { "type": "url", "id": "announcement_link_2_url", "label": "Link 2 URL" },
+    { "type": "text", "id": "announcement_link_3_label", "label": "Link 3 label", "default": "Account" },
+    { "type": "url", "id": "announcement_link_3_url", "label": "Link 3 URL" }
+  ]
+}
+{% endschema %}

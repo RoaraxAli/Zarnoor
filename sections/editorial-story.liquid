@@ -1,0 +1,48 @@
+<section id="editorial" class="editorial-section">
+  <div class="editorial-container">
+    <div class="editorial-text-col">
+      <span class="section-eyebrow">{{ section.settings.eyebrow | default: 'The studio' }}</span>
+      <h2 class="editorial-heading">{{ section.settings.title | default: 'Made in small runs, worn for years.' }}</h2>
+      <p class="editorial-description">
+        {{ section.settings.text | default: 'Zarnoor is a Pakistani ready-to-wear label working with embroidered lawn, organza and silk. Every piece is cut, finished and checked by hand, in limited runs rather than seasons of excess.' }}
+      </p>
+      <div class="editorial-cta-row" style="margin-top: 26px;">
+        {%- if section.settings.cta_url != blank -%}
+          <a href="{{ section.settings.cta_url }}" class="btn btn--outline">{{ section.settings.cta_label | default: 'Read our story' }}</a>
+        {%- elsif pages.about != blank -%}
+          <a href="{{ pages.about.url }}" class="btn btn--outline">{{ section.settings.cta_label | default: 'Read our story' }}</a>
+        {%- else -%}
+          <a href="{{ routes.all_products_collection_url }}" class="btn btn--outline">{{ section.settings.cta_label | default: 'Shop the collection' }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="editorial-media-col">
+      <div class="editorial-image-frame">
+        <img
+          src="{% if section.settings.image != blank %}{{ section.settings.image | image_url: width: 1200 }}{% endif %}"
+          alt="Zarnoor studio"
+          loading="lazy"
+          width="1000"
+          height="1250"
+          class="editorial-main-img"
+        >
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Editorial story",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The studio" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Made in small runs, worn for years." },
+    { "type": "textarea", "id": "text", "label": "Body" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Read our story" },
+    { "type": "url", "id": "cta_url", "label": "Button link" }
+  ],
+  "presets": [{ "name": "Editorial story" }]
+}
+{% endschema %}

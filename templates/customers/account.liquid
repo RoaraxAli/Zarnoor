@@ -1,0 +1,32 @@
+<div class="page-shell">
+  <h1>Account</h1>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:24px;">
+    {{ customer.name | default: customer.email }} · {{ customer.email }}
+  </p>
+
+  <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:32px;font-size:11px;">
+    <a href="{{ routes.account_addresses_url }}" style="border-bottom:1px solid currentColor;">Addresses</a>
+    <a href="{{ routes.account_logout_url }}" style="border-bottom:1px solid currentColor;">Sign out</a>
+  </div>
+
+  <h2 style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px;">Orders</h2>
+
+  {% paginate customer.orders by 10 %}
+    {% if customer.orders.size > 0 %}
+      <div style="display:grid;gap:0;">
+        {% for order in customer.orders %}
+          <a href="{{ order.customer_url }}" style="display:flex;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);font-size:12px;">
+            <span>{{ order.name }}</span>
+            <span style="color:var(--muted);">{{ order.created_at | date: '%d %b %Y' }}</span>
+            <span>{{ order.total_price | money }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding:32px 0;">
+        <p>No orders yet.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="btn btn--outline">Shop all pieces</a>
+      </div>
+    {% endif %}
+  {% endpaginate %}
+</div>

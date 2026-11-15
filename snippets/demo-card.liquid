@@ -1,0 +1,33 @@
+{%- comment -%}
+  Fallback card used only when the store has no published products.
+  Accepts: index, title, fabric, price, compare, image, link
+{%- endcomment -%}
+
+{%- assign demo_index = index | default: 1 -%}
+{%- assign demo_fallback = 'editorial-0' | append: demo_index | append: '.jpg' -%}
+
+<article class="product-card">
+  <div class="card-media">
+    <a href="{{ link | default: routes.all_products_collection_url }}" aria-label="{{ title | escape }}">
+      {%- if image != blank -%}
+        <img src="{{ image | asset_url }}" alt="{{ title | escape }}" width="800" height="1200" loading="lazy">
+      {%- else -%}
+        <span class="card-media--fallback" style="position:absolute;inset:0;display:flex;">
+          <span class="card-fallback-mark">{{ fabric }}<span>Zarnoor</span></span>
+        </span>
+      {%- endif -%}
+    </a>
+  </div>
+  <div class="product-meta">
+    <span class="card-fabric">{{ fabric }}</span>
+    <h3 class="card-title"><a href="{{ link | default: routes.all_products_collection_url }}">{{ title }}</a></h3>
+    <div class="card-price">
+      {%- if compare != blank -%}
+        <ins>PKR {{ price }}</ins>
+        <del>PKR {{ compare }}</del>
+      {%- else -%}
+        <span>PKR {{ price }}</span>
+      {%- endif -%}
+    </div>
+  </div>
+</article>

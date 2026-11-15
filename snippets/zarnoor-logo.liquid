@@ -1,0 +1,25 @@
+{%- if settings.logo != blank -%}
+  <a href="{{ routes.root_url }}" class="brand-logo-link" aria-label="{{ shop.name | escape }}">
+    <img
+      src="{{ settings.logo | image_url: width: 480 }}"
+      srcset="{{ settings.logo | image_url: width: 240 }} 240w, {{ settings.logo | image_url: width: 480 }} 480w"
+      sizes="(max-width: 749px) 140px, 220px"
+      alt="{{ shop.name | escape }}"
+      class="brand-logo-img"
+      width="{{ settings.logo.width }}"
+      height="{{ settings.logo.height }}"
+      loading="eager"
+    >
+  </a>
+{%- else -%}
+  <a href="{{ routes.root_url }}" class="brand-logo-link" aria-label="{{ shop.name | escape }}">
+    <img
+      src="{{ 'zarnoor-logo.png' | asset_url }}"
+      alt="{{ shop.name | escape }}"
+      class="brand-logo-img"
+      width="526"
+      height="526"
+      loading="eager"
+    >
+  </a>
+{%- endif -%}

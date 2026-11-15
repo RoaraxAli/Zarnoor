@@ -1,0 +1,53 @@
+<div class="search-page">
+  <nav class="breadcrumbs" aria-label="Breadcrumb" style="margin-bottom:16px;">
+    <a href="{{ routes.root_url }}">Home</a>
+    <span aria-hidden="true">/</span>
+    <span>Search</span>
+  </nav>
+
+  <h1>{% if search.performed %}{{ section.settings.results_heading | default: 'Results for' }} “{{ search.terms }}”{% else %}{{ section.settings.search_heading | default: 'Search' }}{% endif %}</h1>
+
+  <form action="{{ routes.search_url }}" method="get" class="search-page-form" role="search">
+    <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search pieces, fabrics or codes" aria-label="Search">
+    <button type="submit">Search</button>
+  </form>
+
+  {%- if search.performed -%}
+    {%- if search.results.size > 0 -%}
+      <p class="toolbar-count" style="margin-bottom:18px;">{{ search.results_count }} {% if search.results_count == 1 %}result{% else %}results{% endif %}</p>
+      <div class="products-grid">
+        {%- for item in search.results -%}
+          {%- if item.object_type == 'product' -%}
+            {% render 'product-card', product: item, index: forloop.index %}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="empty-state">
+        <h2>{{ section.settings.no_results_heading | default: 'No matches' }}</h2>
+        <p>{{ section.settings.no_results_text | default: 'Try a simpler word, a fabric like “organza”, or browse everything.' }}</p>
+        <a href="{{ routes.all_products_collection_url }}" class="btn btn--outline">{{ section.settings.browse_label | default: 'Shop all pieces' }}</a>
+      </div>
+    {%- endif -%}
+  {%- else -%}
+    <div class="empty-state">
+      <h2>{{ section.settings.idle_heading | default: 'What are you looking for?' }}</h2>
+      <p>{{ section.settings.idle_text | default: 'Search by piece, fabric or code.' }}</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Search results",
+  "settings": [
+    { "type": "text", "id": "search_heading", "label": "Search page heading", "default": "Search" },
+    { "type": "text", "id": "results_heading", "label": "Results heading", "default": "Results for" },
+    { "type": "text", "id": "no_results_heading", "label": "No results heading", "default": "No matches" },
+    { "type": "textarea", "id": "no_results_text", "label": "No results text", "default": "Try a simpler word, a fabric like “organza”, or browse everything." },
+    { "type": "text", "id": "browse_label", "label": "Browse button label", "default": "Shop all pieces" },
+    { "type": "text", "id": "idle_heading", "label": "Idle heading", "default": "What are you looking for?" },
+    { "type": "textarea", "id": "idle_text", "label": "Idle text", "default": "Search by piece, fabric or code." }
+  ]
+}
+{% endschema %}

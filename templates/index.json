@@ -1,0 +1,66 @@
+{
+  "sections": {
+    "hero_banner": {
+      "type": "hero-banner",
+      "blocks": {
+        "slide_AMMF4G": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/The_Mehfil_Edit_26.jpg",
+            "alt": "Zarnoor campaign",
+            "link": ""
+          }
+        },
+        "slide_aHejUb": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/Luxury_Pret.jpg",
+            "alt": "Zarnoor campaign",
+            "link": ""
+          }
+        },
+        "slide_W98dqT": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/Sangeet_Collection.jpg",
+            "alt": "Zarnoor campaign",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide_AMMF4G",
+        "slide_aHejUb",
+        "slide_W98dqT"
+      ],
+      "custom_css": [],
+      "settings": {}
+    },
+    "shop_by_edit": {
+      "type": "shop-by-edit",
+      "settings": {
+        "eyebrow": "Shop by category",
+        "title": "Find your kind of beautiful.",
+        "link_label": "All collections",
+        "link_url": "",
+        "limit": 3
+      }
+    },
+    "featured_products": {
+      "type": "featured-products",
+      "settings": {
+        "eyebrow": "New in",
+        "title": "All pieces",
+        "collection": "all",
+        "products_to_show": 8,
+        "empty_heading": "No pieces yet",
+        "empty_text": "Choose a collection in the theme editor to show pieces here."
+      }
+    }
+  },
+  "order": [
+    "hero_banner",
+    "shop_by_edit",
+    "featured_products"
+  ]
+}

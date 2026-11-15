@@ -1,0 +1,48 @@
+<div id="quickview-overlay" class="drawer-overlay" aria-hidden="true"></div>
+
+<div id="quickview-modal" class="quickview-modal" role="dialog" aria-modal="true" aria-label="Quick add" aria-hidden="true">
+  <button id="quickview-close-btn" class="quickview-close-btn" type="button" aria-label="Close">×</button>
+
+  <div class="quickview-body">
+    <div class="quickview-image-wrap">
+      <img id="qv-image" src="" alt="">
+    </div>
+
+    <div class="quickview-info">
+      <span id="qv-vendor" class="eyebrow">{{ shop.name }}</span>
+      <h3 id="qv-title" class="quickview-title"></h3>
+      <span id="qv-code" class="product-sku"></span>
+
+      <div class="quickview-price-row">
+        <span id="qv-price" class="price-current"></span>
+        <span id="qv-compare-price" class="price-original" style="display:none;"></span>
+      </div>
+
+      <div class="quickview-size-selector" id="qv-options-wrap">
+        <div class="size-label">
+          <span id="qv-option-label">Select size</span>
+          <a class="size-guide-btn" id="qv-size-guide-link" href="#">Size guide</a>
+        </div>
+        <div class="size-pills" id="qv-size-pills"></div>
+      </div>
+
+      <p id="qv-description" class="quickview-description"></p>
+
+      <div class="quickview-actions">
+        <button id="qv-add-btn" class="btn btn-primary btn--block" type="button">Add to bag</button>
+        <a id="qv-view-link" class="btn btn--outline btn--block" href="#">View full details</a>
+      </div>
+
+      <div class="quickview-perks">
+        <div class="perk-item">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <span>Free nationwide delivery · COD available</span>
+        </div>
+        <div class="perk-item">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <span>7-day exchange on unworn pieces</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

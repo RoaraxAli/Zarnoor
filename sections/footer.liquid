@@ -1,0 +1,204 @@
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-grid">
+      <div class="footer-col footer-brand-col">
+        {% render 'zarnoor-logo' %}
+        {%- if section.settings.brand_sub != blank -%}
+          <span class="footer-brand-sub">{{ section.settings.brand_sub }}</span>
+        {%- endif -%}
+        {%- if section.settings.brand_description != blank -%}
+          <p class="footer-brand-desc">{{ section.settings.brand_description }}</p>
+        {%- endif -%}
+        {%- if section.settings.show_contact -%}
+          <div class="footer-direct-contact">
+            {%- if section.settings.contact_label != blank -%}
+              <span class="contact-label">{{ section.settings.contact_label }}</span>
+            {%- endif -%}
+            <a class="contact-val" href="https://wa.me/{{ settings.whatsapp_number | default: '923303957520' }}" target="_blank" rel="noopener">
+              {%- if section.settings.contact_value != blank -%}
+                {{ section.settings.contact_value }}
+              {%- else -%}
+                WhatsApp +{{ settings.whatsapp_number | default: '92 330 3957520' }}
+              {%- endif -%}
+            </a>
+            {%- if settings.contact_email != blank -%}
+              <a class="contact-val" href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'menu' -%}
+            <div class="footer-col" {{ block.shopify_attributes }}>
+              {%- if block.settings.heading != blank -%}
+                <h5 class="footer-heading">{{ block.settings.heading }}</h5>
+              {%- endif -%}
+              {%- assign footer_menu = linklists[block.settings.menu] -%}
+              <ul class="footer-links">
+                {%- if footer_menu.links.size > 0 -%}
+                  {%- for link in footer_menu.links -%}
+                    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                  {%- endfor -%}
+                {%- else -%}
+                  {%- if block.settings.fallback == 'collections' -%}
+                    <li><a href="{{ routes.all_products_collection_url }}">All pieces</a></li>
+                    {%- for collection in collections limit: 4 -%}
+                      {%- if collection.all_products_count > 0 and collection.handle != 'frontpage' -%}
+                        <li><a href="{{ collection.url }}">{{ collection.title }}</a></li>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- elsif block.settings.fallback == 'policies' -%}
+                    {% if pages.faq != blank %}<li><a href="{{ pages.faq.url }}">FAQs</a></li>{% endif %}
+                    {% if pages['size-guide'] != blank %}<li><a href="{{ pages['size-guide'].url }}">Size guide</a></li>{% endif %}
+                    {% if settings.order_tracking_url != blank %}<li><a href="{{ settings.order_tracking_url }}">Track your order</a></li>{% endif %}
+                    {% if shop.shipping_policy != blank %}<li><a href="{{ shop.shipping_policy.url }}">Shipping &amp; delivery</a></li>{% endif %}
+                    {% if shop.refund_policy != blank %}<li><a href="{{ shop.refund_policy.url }}">Returns &amp; exchanges</a></li>{% endif %}
+                    {% if pages.contact != blank %}<li><a href="{{ pages.contact.url }}">Contact</a></li>{% endif %}
+                  {%- endif -%}
+                {%- endif -%}
+              </ul>
+            </div>
+
+          {%- when 'newsletter' -%}
+            <div class="footer-col footer-newsletter-col" {{ block.shopify_attributes }}>
+              {%- if block.settings.heading != blank -%}
+                <h5 class="footer-heading">{{ block.settings.heading }}</h5>
+              {%- endif -%}
+              {%- if block.settings.description != blank -%}
+                <p class="newsletter-desc">{{ block.settings.description }}</p>
+              {%- endif -%}
+
+              {% form 'customer', class: 'footer-newsletter-form' %}
+                <input type="hidden" name="contact[tags]" value="newsletter">
+                <div class="newsletter-input-group">
+                  <input
+                    type="email"
+                    name="contact[email]"
+                    class="newsletter-input"
+                    placeholder="{{ block.settings.placeholder | default: 'Email address' }}"
+                    aria-label="Email address"
+                    required
+                    autocomplete="email"
+                  >
+                  <button type="submit" class="newsletter-btn">{{ block.settings.button_label | default: 'Join' }}</button>
+                </div>
+                {% if form.posted_successfully? %}
+                  <p class="newsletter-desc" style="margin-top:10px;">{{ block.settings.success_text | default: 'Thank you — you’re on the list.' }}</p>
+                {% endif %}
+                {% if form.errors %}
+                  <p class="newsletter-desc" style="margin-top:10px;">{{ block.settings.error_text | default: 'Please check your email address.' }}</p>
+                {% endif %}
+              {% endform %}
+
+              {%- if section.settings.show_social -%}
+                <div class="footer-social-row">
+                  {% if settings.instagram_url != blank %}<a href="{{ settings.instagram_url }}" class="social-icon" target="_blank" rel="noopener">Instagram</a>{% endif %}
+                  {% if settings.facebook_url != blank %}<a href="{{ settings.facebook_url }}" class="social-icon" target="_blank" rel="noopener">Facebook</a>{% endif %}
+                  {% if settings.tiktok_url != blank %}<a href="{{ settings.tiktok_url }}" class="social-icon" target="_blank" rel="noopener">TikTok</a>{% endif %}
+                  <a href="https://wa.me/{{ settings.whatsapp_number | default: '923303957520' }}" class="social-icon" target="_blank" rel="noopener">WhatsApp</a>
+                </div>
+              {%- endif -%}
+            </div>
+
+          {%- when 'text' -%}
+            <div class="footer-col" {{ block.shopify_attributes }}>
+              {%- if block.settings.heading != blank -%}
+                <h5 class="footer-heading">{{ block.settings.heading }}</h5>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <p class="footer-brand-desc">{{ block.settings.text }}</p>
+              {%- endif -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div class="footer-copy">
+        <p>
+          {%- if section.settings.copyright_text != blank -%}
+            {{ section.settings.copyright_text }}
+          {%- else -%}
+            © {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.
+          {%- endif -%}
+        </p>
+      </div>
+      <div class="footer-payment-badges">
+        {%- assign badges = section.settings.payment_badges | default: 'Cash on delivery, Visa, Mastercard' | split: ',' -%}
+        {%- for badge in badges -%}
+          {%- assign b = badge | strip -%}
+          {%- if b != blank -%}
+            {%- if forloop.first == false -%}{%- endif -%}
+            <span class="payment-badge">{{ b }}</span>
+          {%- endif -%}
+        {%- endfor -%}
+        {% if shop.privacy_policy != blank %}<a class="payment-badge" href="{{ shop.privacy_policy.url }}">Privacy</a>{% endif %}
+        {% if shop.terms_of_service != blank %}<a class="payment-badge" href="{{ shop.terms_of_service.url }}">Terms</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    { "type": "text", "id": "brand_sub", "label": "Brand subtitle", "default": "Ready to wear · Pakistan" },
+    { "type": "textarea", "id": "brand_description", "label": "Brand description", "default": "Embroidered lawn, organza and silk, cut and finished in small runs. Free nationwide delivery with cash on delivery." },
+    { "type": "checkbox", "id": "show_contact", "label": "Show contact block", "default": true },
+    { "type": "text", "id": "contact_label", "label": "Contact label", "default": "Studio" },
+    { "type": "text", "id": "contact_value", "label": "Contact value (blank = WhatsApp number)" },
+    { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true },
+    { "type": "text", "id": "payment_badges", "label": "Payment badges (comma separated)", "default": "Cash on delivery, Visa, Mastercard" },
+    { "type": "text", "id": "copyright_text", "label": "Copyright text (blank = auto)" }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Link column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Help" },
+        { "type": "link_list", "id": "menu", "label": "Menu" },
+        { "type": "select", "id": "fallback", "label": "Fallback if no menu", "default": "policies", "options": [
+          { "value": "none", "label": "None" },
+          { "value": "collections", "label": "Auto list collections" },
+          { "value": "policies", "label": "Store policies & pages" }
+        ]}
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Studio notes" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "New pieces, restocks and sizing notes. One email a month at most." },
+        { "type": "text", "id": "placeholder", "label": "Email placeholder", "default": "Email address" },
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Join" },
+        { "type": "text", "id": "success_text", "label": "Success message", "default": "Thank you — you’re on the list." },
+        { "type": "text", "id": "error_text", "label": "Error message", "default": "Please check your email address." }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading" },
+        { "type": "textarea", "id": "text", "label": "Text" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer",
+      "blocks": [
+        { "type": "menu", "settings": { "heading": "Help", "fallback": "policies" } },
+        { "type": "menu", "settings": { "heading": "Shop", "fallback": "collections" } },
+        { "type": "newsletter" }
+      ]
+    }
+  ]
+}
+{% endschema %}

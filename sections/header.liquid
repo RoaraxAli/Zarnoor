@@ -1,0 +1,64 @@
+<header class="site-header" id="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <button
+        id="hamburger-btn"
+        class="hamburger-btn"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-sidebar"
+      >
+        <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+
+      <nav class="desktop-nav" aria-label="Main navigation">
+        {%- assign header_menu = linklists[section.settings.menu] -%}
+        {%- if header_menu.links.size > 0 -%}
+          {%- for link in header_menu.links limit: 8 -%}
+            <a class="nav-link{% if link.title contains 'Sale' %} nav-link--sale{% endif %}" href="{{ link.url }}">{{ link.title }}</a>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for collection in collections limit: 5 -%}
+            {%- if collection.all_products_count > 0 and collection.handle != 'frontpage' -%}
+              <a class="nav-link{% if collection.title contains 'Sale' %} nav-link--sale{% endif %}" href="{{ collection.url }}">{{ collection.title }}</a>
+            {%- endif -%}
+          {%- endfor -%}
+          <a class="nav-link" href="{{ routes.all_products_collection_url }}">All pieces</a>
+        {%- endif -%}
+      </nav>
+    </div>
+
+    <div class="header-center">
+      {% render 'zarnoor-logo' %}
+    </div>
+
+    <div class="header-right">
+      <button id="search-toggle-btn" class="header-action-btn" type="button" aria-label="Search">
+        <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.6-4.6M17.5 10.5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      </button>
+
+      <button id="wishlist-toggle-btn" class="header-action-btn" type="button" aria-label="Saved pieces">
+        <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.5s-7.5-4.6-7.5-9.6a4.1 4.1 0 017.5-2.4 4.1 4.1 0 017.5 2.4c0 5-7.5 9.6-7.5 9.6z"/></svg>
+      </button>
+
+      <a href="{{ routes.account_url }}" class="header-action-btn" aria-label="Account">
+        <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+      </a>
+
+      <button id="cart-toggle-btn" class="header-action-btn cart-action-btn" type="button" aria-label="Open bag">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        <span id="header-cart-count" class="cart-badge" data-count="{{ cart.item_count }}">{{ cart.item_count }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    { "type": "link_list", "id": "menu", "label": "Desktop menu", "default": "main-menu" }
+  ]
+}
+{% endschema %}

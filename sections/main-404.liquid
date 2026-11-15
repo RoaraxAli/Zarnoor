@@ -1,0 +1,20 @@
+<div class="not-found">
+  <div style="margin-bottom:24px;">{% render 'zarnoor-logo' %}</div>
+  <span class="section-eyebrow">{{ section.settings.eyebrow | default: 'Error 404' }}</span>
+  <h1>{{ section.settings.title | default: 'Page not found' }}</h1>
+  <p>{{ section.settings.text | default: 'The page you’re looking for has moved or no longer exists.' }}</p>
+  <a href="{{ section.settings.button_url | default: routes.all_products_collection_url }}" class="btn btn--outline">{{ section.settings.button_label | default: 'Shop all pieces' }}</a>
+</div>
+
+{% schema %}
+{
+  "name": "404",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Error 404" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Page not found" },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "The page you’re looking for has moved or no longer exists." },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop all pieces" },
+    { "type": "url", "id": "button_url", "label": "Button URL" }
+  ]
+}
+{% endschema %}

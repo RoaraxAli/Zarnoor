@@ -1,0 +1,61 @@
+<section class="lookbook-section">
+  <div class="lookbook-header">
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="section-eyebrow">{{ section.settings.eyebrow }}</span>
+    {%- endif -%}
+    <h2 class="section-title">{{ section.settings.title }}</h2>
+    {%- if section.settings.subtitle != blank -%}
+      <p class="section-subtitle">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="lookbook-grid lookbook-grid--duo">
+    {%- for block in section.blocks -%}
+      <a class="lookbook-card" href="{{ block.settings.link | default: routes.all_products_collection_url }}" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.tag | escape }}" loading="lazy" width="800" height="1200">
+        {%- endif -%}
+        <span class="lookbook-overlay">
+          {%- if block.settings.tag != blank -%}
+            <span class="lookbook-tag">{{ block.settings.tag }}</span>
+          {%- endif -%}
+          {%- if block.settings.cta != blank -%}
+            <span class="btn-shop-look">{{ block.settings.cta }}</span>
+          {%- endif -%}
+        </span>
+      </a>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Lookbook",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The lookbook" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "How it’s worn." },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Styled in the studio, photographed without retouching." }
+  ],
+  "blocks": [
+    {
+      "type": "look",
+      "name": "Look",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "tag", "label": "Tag", "default": "Occasion · Organza" },
+        { "type": "text", "id": "cta", "label": "Button label", "default": "Shop the look" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lookbook",
+      "blocks": [
+        { "type": "look", "settings": { "tag": "Occasion · Organza", "cta": "Shop the look" } },
+        { "type": "look", "settings": { "tag": "Everyday · Silk", "cta": "Shop the look" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

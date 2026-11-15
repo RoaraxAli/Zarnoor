@@ -1,0 +1,33 @@
+<div class="collection-wrap" style="padding-top:36px;">
+  <div class="section-header" style="margin-bottom:26px;">
+    <div class="section-header-title-block">
+      <span class="section-eyebrow">{{ section.settings.eyebrow | default: 'Collections' }}</span>
+      <h1 class="section-title">{{ section.settings.title | default: 'Shop by category' }}</h1>
+    </div>
+  </div>
+
+  <div class="collections-grid">
+    {%- for collection in collections -%}
+      {%- if collection.handle == 'frontpage' -%}{%- continue -%}{%- endif -%}
+      <a class="collection-card" href="{{ collection.url }}">
+        {%- if collection.image != blank -%}
+          <img src="{{ collection.image | image_url: width: 900 }}" alt="{{ collection.title | escape }}" width="{{ collection.image.width }}" height="{{ collection.image.height }}" loading="lazy">
+        {%- elsif collection.products.first.featured_image -%}
+          <img src="{{ collection.products.first.featured_image | image_url: width: 900 }}" alt="{{ collection.title | escape }}" loading="lazy">
+        {%- endif -%}
+        <span class="collection-card-count">{{ collection.all_products_count }} pieces</span>
+        <span class="collection-card-title">{{ collection.title }}</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collections list",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Collections" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Shop by category" }
+  ]
+}
+{% endschema %}

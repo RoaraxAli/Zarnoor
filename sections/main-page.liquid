@@ -1,0 +1,19 @@
+<div class="page-shell">
+  <nav class="breadcrumbs" aria-label="Breadcrumb" style="margin-bottom:18px;">
+    <a href="{{ routes.root_url }}">Home</a>
+    <span aria-hidden="true">/</span>
+    <span>{{ page.title }}</span>
+  </nav>
+
+  <h1>{{ page.title }}</h1>
+  <div class="page-content">
+    {{ page.content }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Page",
+  "settings": []
+}
+{% endschema %}

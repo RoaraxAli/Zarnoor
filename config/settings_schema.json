@@ -1,0 +1,43 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Zarnoor",
+    "theme_version": "2.0.0",
+    "theme_author": "Zarnoor",
+    "theme_documentation_url": "https://zarnoor.com",
+    "theme_support_url": "https://zarnoor.com"
+  },
+  {
+    "name": "Brand",
+    "settings": [
+      { "type": "image_picker", "id": "logo", "label": "Logo" },
+      { "type": "range", "id": "logo_width", "min": 60, "max": 220, "step": 2, "unit": "px", "default": 116, "label": "Logo width" },
+      { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "923303957520", "info": "Digits only, including country code." },
+      { "type": "text", "id": "contact_email", "label": "Contact email", "default": "zarnoorbyukasha@gmail.com" },
+      { "type": "url", "id": "instagram_url", "label": "Instagram" },
+      { "type": "url", "id": "facebook_url", "label": "Facebook" },
+      { "type": "url", "id": "tiktok_url", "label": "TikTok" },
+      { "type": "text", "id": "mobile_concierge_title", "label": "Mobile menu help title", "default": "Need a hand?" },
+      { "type": "textarea", "id": "mobile_concierge_text", "label": "Mobile menu help text", "default": "Message the studio for sizing, fabric or order questions." },
+      { "type": "text", "id": "mobile_concierge_button", "label": "Mobile menu help button", "default": "Chat on WhatsApp" },
+      { "type": "text", "id": "wishlist_label", "label": "Wishlist label", "default": "Saved pieces" }
+    ]
+  },
+  {
+    "name": "Shop",
+    "settings": [
+      { "type": "text", "id": "announcement_text", "label": "Announcement bar", "default": "Free nationwide delivery · Cash on delivery available" },
+      { "type": "number", "id": "free_shipping_threshold", "label": "Free delivery threshold (PKR)", "default": 0, "info": "0 means free delivery on every order." },
+      { "type": "url", "id": "order_tracking_url", "label": "Order tracking link" }
+    ]
+  },
+  {
+    "name": "Colours",
+    "settings": [
+      { "type": "color", "id": "color_accent", "label": "Accent", "default": "#4A1620" },
+      { "type": "color", "id": "color_text", "label": "Text", "default": "#1D1B19" },
+      { "type": "color", "id": "color_background", "label": "Background", "default": "#FFFFFF" },
+      { "type": "color", "id": "color_soft", "label": "Soft background", "default": "#FAF9F6" }
+    ]
+  }
+]

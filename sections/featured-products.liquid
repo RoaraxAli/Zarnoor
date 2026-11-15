@@ -1,0 +1,40 @@
+{%- assign featured_collection = section.settings.collection | default: collections['all'] -%}
+{%- assign product_limit = section.settings.products_to_show | default: 8 -%}
+
+<section id="collection" class="section-products">
+  <div class="section-header">
+    <div class="section-header-title-block">
+      <span class="section-eyebrow">{{ section.settings.eyebrow | default: 'New in' }}</span>
+      <h2 class="section-title">{{ section.settings.title | default: 'All pieces' }}</h2>
+    </div>
+    <a class="editorial-link" href="{{ featured_collection.url | default: '/collections/all' }}">View all</a>
+  </div>
+
+  {%- if featured_collection.products.size > 0 -%}
+    <div class="products-grid">
+      {%- for product in featured_collection.products limit: product_limit -%}
+        {% render 'product-card', product: product, index: forloop.index %}
+      {%- endfor -%}
+    </div>
+  {%- else -%}
+    <div class="empty-state">
+      <h2>{{ section.settings.empty_heading | default: 'No pieces yet' }}</h2>
+      <p>{{ section.settings.empty_text | default: 'Choose a collection in the theme editor to show pieces here.' }}</p>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Featured products",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "New in" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "All pieces" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "products_to_show", "min": 4, "max": 16, "step": 4, "default": 8, "label": "Products to show" },
+    { "type": "text", "id": "empty_heading", "label": "Empty state heading", "default": "No pieces yet" },
+    { "type": "textarea", "id": "empty_text", "label": "Empty state text", "default": "Choose a collection in the theme editor to show pieces here." }
+  ],
+  "presets": [{ "name": "Featured products" }]
+}
+{% endschema %}
