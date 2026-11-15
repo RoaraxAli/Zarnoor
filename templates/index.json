@@ -62,7 +62,7 @@
       "settings": {
         "eyebrow": "Customer favourites",
         "title": "Best sellers",
-        "collection": "",
+        "collection": "best-seller",
         "tag": "best-seller",
         "products_to_show": 4,
         "show_view_all": true,
