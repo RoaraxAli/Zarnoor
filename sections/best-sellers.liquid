@@ -27,7 +27,8 @@
           {%- endif -%}
         {%- endfor -%}
         {%- if product_tag_match -%}
-          <div class="best-sellers-slide">{% render 'product-card', product: product, index: rendered_count | plus: 1 %}</div>
+          {%- assign product_card_index = rendered_count | plus: 1 -%}
+          <div class="best-sellers-slide">{% render 'product-card', product: product, index: product_card_index %}</div>
           {%- assign rendered_count = rendered_count | plus: 1 -%}
           {%- if rendered_count >= product_limit -%}{%- break -%}{%- endif -%}
         {%- endif -%}
