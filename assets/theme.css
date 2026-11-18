@@ -208,12 +208,8 @@ input, select, textarea, button { border-radius: 8px; }
 .announcement-center { flex: 1; text-align: center; }
 .announcement-highlight { font-weight: 500; }
 .announcement-divider { margin: 0 10px; opacity: .6; }
-.announcement-links { display: flex; gap: 18px; white-space: nowrap; }
-.announcement-links a { opacity: .85; }
-.announcement-links a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 899px) {
-  .announcement-links { display: none; }
   .announcement-bar-inner { justify-content: center; padding: 7px 12px; }
 }
 @media (max-width: 749px) {
