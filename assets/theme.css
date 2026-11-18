@@ -1468,6 +1468,14 @@ input, select, textarea, button { border-radius: 8px; }
 .newsletter-btn { flex: 0 0 auto; padding: 0 18px; border-radius: 0; background: #fff; color: #5b1020; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; transition: background .2s ease; }
 .newsletter-btn:hover { background: rgba(255, 255, 255, .88); }
 
+/* Brand social icons under the footer logo */
+.footer-brand-social { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
+.footer-brand-social .social-btn { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid rgba(255, 255, 255, .45); border-radius: 50%; color: #fff; transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease; }
+.footer-brand-social .social-btn svg { width: 15px; height: 15px; display: block; }
+.footer-brand-social .social-btn svg path { fill: currentColor; }
+.footer-brand-social .social-btn:hover { background: #fff; border-color: #fff; color: #5b1020; transform: translateY(-1px); }
+.footer-brand-social .social-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
 .footer-social-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
 .social-icon { display: inline-flex; min-height: 34px; align-items: center; padding: 0 10px; border: 1px solid rgba(255, 255, 255, .55); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .9); transition: all .2s ease; }
 .social-icon:hover { border-color: #fff; color: #fff; }
