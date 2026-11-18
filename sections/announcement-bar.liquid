@@ -1,21 +1,30 @@
-<div class="announcement-bar-wrapper">
+{%- assign notice_message = section.settings.message | default: settings.announcement_text -%}
+{%- if notice_message == blank -%}
+  {%- assign notice_message = "Free nationwide delivery · Cash on delivery available — Winter Collection coming soon" -%}
+{%- endif -%}
+
+<div class="announcement-bar-wrapper" {{ section.shopify_attributes }}>
   <div class="announcement-bar-inner">
     <div class="announcement-item announcement-center">
-      <span>{{ settings.announcement_text | default: 'Free nationwide delivery · Cash on delivery available' }}</span>
+      {%- if section.settings.message_url != blank -%}
+        <a href="{{ section.settings.message_url }}">{{ notice_message }}</a>
+      {%- else -%}
+        <span>{{ notice_message }}</span>
+      {%- endif -%}
     </div>
     <div class="announcement-links">
-      {% assign l1_url = settings.announcement_link_1_url | default: settings.order_tracking_url | default: routes.account_url %}
-      {% assign l2_url = settings.announcement_link_2_url | default: routes.search_url %}
-      {% assign l3_url = settings.announcement_link_3_url | default: routes.account_url %}
-      {% if settings.announcement_link_1_label != blank %}
-        <a href="{{ l1_url }}">{{ settings.announcement_link_1_label }}</a>
-      {% endif %}
-      {% if settings.announcement_link_2_label != blank %}
-        <a href="{{ l2_url }}">{{ settings.announcement_link_2_label }}</a>
-      {% endif %}
-      {% if settings.announcement_link_3_label != blank %}
-        <a href="{{ l3_url }}">{{ settings.announcement_link_3_label }}</a>
-      {% endif %}
+      {%- assign l1_url = section.settings.announcement_link_1_url | default: settings.order_tracking_url | default: routes.account_url -%}
+      {%- assign l2_url = section.settings.announcement_link_2_url | default: routes.search_url -%}
+      {%- assign l3_url = section.settings.announcement_link_3_url | default: routes.account_url -%}
+      {%- if section.settings.announcement_link_1_label != blank -%}
+        <a href="{{ l1_url }}">{{ section.settings.announcement_link_1_label }}</a>
+      {%- endif -%}
+      {%- if section.settings.announcement_link_2_label != blank -%}
+        <a href="{{ l2_url }}">{{ section.settings.announcement_link_2_label }}</a>
+      {%- endif -%}
+      {%- if section.settings.announcement_link_3_label != blank -%}
+        <a href="{{ l3_url }}">{{ section.settings.announcement_link_3_label }}</a>
+      {%- endif -%}
     </div>
   </div>
 </div>
@@ -24,12 +33,21 @@
 {
   "name": "Announcement bar",
   "settings": [
+    {
+      "type": "text",
+      "id": "message",
+      "label": "Announcement text",
+      "info": "Leave blank to fall back to Theme settings → Shop → Announcement bar.",
+      "default": "Free nationwide delivery · Cash on delivery available — Winter Collection coming soon"
+    },
+    { "type": "url", "id": "message_url", "label": "Announcement link (optional)" },
     { "type": "text", "id": "announcement_link_1_label", "label": "Link 1 label", "default": "Track order" },
     { "type": "url", "id": "announcement_link_1_url", "label": "Link 1 URL" },
     { "type": "text", "id": "announcement_link_2_label", "label": "Link 2 label", "default": "Search" },
     { "type": "url", "id": "announcement_link_2_url", "label": "Link 2 URL" },
     { "type": "text", "id": "announcement_link_3_label", "label": "Link 3 label", "default": "Account" },
     { "type": "url", "id": "announcement_link_3_url", "label": "Link 3 URL" }
-  ]
+  ],
+  "presets": [{ "name": "Announcement bar" }]
 }
 {% endschema %}

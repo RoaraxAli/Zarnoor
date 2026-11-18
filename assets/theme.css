@@ -218,7 +218,7 @@ input, select, textarea, button { border-radius: 8px; }
 }
 @media (max-width: 749px) {
   .announcement-bar-inner { min-height: 28px; }
-  .announcement-item { font-size: 8px; letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .announcement-item { font-size: 9px; letter-spacing: .02em; line-height: 1.5; white-space: normal; overflow: visible; text-overflow: clip; padding: 2px 0; }
 }
 
 /* ---------- Header ---------- */
@@ -1516,6 +1516,16 @@ input, select, textarea, button { border-radius: 8px; }
   .footer-bottom-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
   .footer-payment-badges { gap: 6px 0; }
 }
+
+/* ---------- Designer credit (footer) ---------- */
+
+.footer-credit { display: flex; justify-content: flex-end; padding: 0 0 18px; }
+.footer-credit-link { display: inline-flex; align-items: center; gap: 8px; opacity: .6; transition: opacity .2s ease; }
+.footer-credit-link:hover, .footer-credit-link:focus-visible { opacity: .95; }
+.footer-credit-text { font-family: var(--sans); font-size: 8px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255, 255, 255, .92); }
+.footer-credit-logo { display: block; width: auto; height: 26px; }
+.footer-credit-link:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+@media (max-width: 520px) { .footer-credit { justify-content: flex-start; padding-bottom: 14px; } .footer-credit-logo { height: 22px; } }
 
 /* ---------- Mobile tab bar ---------- */
 

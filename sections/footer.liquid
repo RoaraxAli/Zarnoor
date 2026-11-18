@@ -146,6 +146,18 @@
         {% if shop.terms_of_service != blank %}<a class="payment-badge" href="{{ shop.terms_of_service.url }}">Terms</a>{% endif %}
       </div>
     </div>
+    {%- if section.settings.show_credit -%}
+      <div class="footer-credit">
+        <a class="footer-credit-link" href="{{ section.settings.credit_url | default: "https://withmiszil.com/" }}" target="_blank" rel="noopener nofollow">
+          <span class="footer-credit-text">{{ section.settings.credit_prefix | default: "Designed and made by" }}</span>
+          {%- if section.settings.credit_logo != blank -%}
+            <img class="footer-credit-logo" src="{{ section.settings.credit_logo | image_url: width: 300 }}" alt="{{ section.settings.credit_alt | default: "WithMiszil" }}" width="300" height="272" loading="lazy" decoding="async">
+          {%- else -%}
+            <img class="footer-credit-logo" src="{{ "withmiszil-logo.png" | asset_url }}" alt="{{ section.settings.credit_alt | default: "WithMiszil" }}" width="300" height="272" loading="lazy" decoding="async">
+          {%- endif -%}
+        </a>
+      </div>
+    {%- endif -%}
   </div>
 </footer>
 
@@ -160,6 +172,11 @@
     { "type": "text", "id": "contact_value", "label": "Contact value (blank = WhatsApp number)" },
     { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true },
     { "type": "text", "id": "payment_badges", "label": "Payment badges (comma separated)", "default": "Cash on delivery, Visa, Mastercard" },
+    { "type": "checkbox", "id": "show_credit", "label": "Show designer credit", "default": true },
+    { "type": "text", "id": "credit_prefix", "label": "Credit text", "default": "Designed and made by" },
+    { "type": "image_picker", "id": "credit_logo", "label": "Credit logo (blank = bundled WithMiszil logo)" },
+    { "type": "text", "id": "credit_alt", "label": "Credit logo alt text", "default": "WithMiszil" },
+    { "type": "url", "id": "credit_url", "label": "Credit link" },
     { "type": "text", "id": "copyright_text", "label": "Copyright text (blank = auto)" }
   ],
   "blocks": [
