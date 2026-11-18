@@ -1,6 +1,6 @@
 {%- assign notice_message = section.settings.message | default: settings.announcement_text -%}
 {%- if notice_message == blank -%}
-  {%- assign notice_message = "Free nationwide delivery · Cash on delivery available — Winter Collection coming soon" -%}
+  {%- assign notice_message = "Free nationwide delivery · Cash on delivery available" -%}
 {%- endif -%}
 
 <div class="announcement-bar-wrapper" {{ section.shopify_attributes }}>
@@ -20,7 +20,7 @@
       "id": "message",
       "label": "Announcement text",
       "info": "Leave blank to fall back to Theme settings → Shop → Announcement bar.",
-      "default": "Free nationwide delivery · Cash on delivery available — Winter Collection coming soon"
+      "default": "Free nationwide delivery · Cash on delivery available"
     }
   ],
   "presets": [{ "name": "Announcement bar" }]
