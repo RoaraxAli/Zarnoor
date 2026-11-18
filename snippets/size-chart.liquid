@@ -1,0 +1,40 @@
+{%- comment -%}
+  Zarnoor size chart — the single source of truth for sizing.
+  Used by the product page size-guide accordion and the size guide page.
+  Measurements (inches): shirt Shoulder/Length/Chest/Hip/Sleeves and
+  trouser Length/Waist/Bottom across Small, Medium, Large, Extra Large.
+{%- endcomment -%}
+<div class="size-chart">
+  <div class="size-chart-scroll">
+    <img
+      src="{{ 'zarnoor-size-chart.jpg' | asset_url }}"
+      alt="Zarnoor size chart — shirt and trouser measurements in inches for Small, Medium, Large and Extra Large"
+      width="1536"
+      height="1024"
+      loading="lazy">
+  </div>
+  <p class="size-chart-note">Garment measurements in inches. Between sizes? Message the studio on WhatsApp.</p>
+</div>
+
+<style>
+  .size-chart { margin: 4px 0 6px; }
+  .size-chart-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--line, #ece5dc);
+    background: #fff;
+  }
+  .size-chart-scroll img {
+    display: block;
+    width: 100%;
+    min-width: 560px;
+    height: auto;
+  }
+  .size-chart-note {
+    margin-top: 10px;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted, #8a7d74);
+  }
+  .size-chart-page .size-chart-scroll img { min-width: 720px; }
+</style>

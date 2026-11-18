@@ -1,4 +1,20 @@
-{%- if page.handle == 'contact' -%}
+{%- if page.handle == 'size-guide' or page.handle == 'size-chart' -%}
+  <section class="page-shell size-chart-page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span aria-hidden="true">/</span>
+      <span>{{ page.title | default: 'Size guide' }}</span>
+    </nav>
+
+    <h1>{{ page.title | default: 'Size guide' }}</h1>
+
+    {%- comment -%}
+      The theme chart is canonical here, so any older chart image saved in the
+      page body is intentionally not printed to avoid two charts side by side.
+    {%- endcomment -%}
+    {% render 'size-chart' %}
+  </section>
+{%- elsif page.handle == 'contact' -%}
   <section class="contact-page page-shell">
     <div class="contact-page__hero">
       <nav class="breadcrumbs" aria-label="Breadcrumb">

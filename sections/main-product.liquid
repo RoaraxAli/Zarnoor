@@ -195,18 +195,7 @@
             {%- if section.settings.size_guide != blank -%}
               {{ section.settings.size_guide }}
             {%- else -%}
-              <table class="size-table">
-                <thead>
-                  <tr><th>Measurement</th><th>XS</th><th>S</th><th>M</th><th>L</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>Length</td><td>56</td><td>56</td><td>57</td><td>57</td></tr>
-                  <tr><td>Chest</td><td>19</td><td>20</td><td>22</td><td>24</td></tr>
-                  <tr><td>Waist</td><td>18</td><td>19</td><td>21</td><td>23</td></tr>
-                  <tr><td>Shoulder</td><td>14</td><td>14</td><td>15</td><td>16</td></tr>
-                </tbody>
-              </table>
-              <p style="margin-top:10px;">Garment measurements in inches. Between sizes? Message the studio on WhatsApp.</p>
+              {% render 'size-chart' %}
             {%- endif -%}
           </div>
         </details>
@@ -263,7 +252,7 @@
     { "type": "text", "id": "usp_3", "label": "USP 3", "default": "7-day exchange on unworn pieces with tags" },
     { "type": "text", "id": "whatsapp_label", "label": "WhatsApp button label", "default": "Order on WhatsApp" },
     { "type": "richtext", "id": "delivery_returns", "label": "Delivery & returns content" },
-    { "type": "richtext", "id": "size_guide", "label": "Size guide content" }
+    { "type": "richtext", "id": "size_guide", "label": "Size guide content", "info": "Leave blank to show the Zarnoor size chart image that ships with the theme." }
   ]
 }
 {% endschema %}
