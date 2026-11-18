@@ -133,12 +133,7 @@
         "reel_4"
       ],
       "settings": {
-        "eyebrow": "In motion",
-        "title": "Favourite Ones",
-        "subtitle": "Four pieces, worn and moving.",
-        "show_follow": true,
-        "follow_label": "Follow along on Instagram",
-        "instagram_url": ""
+        "title": "Favourite Ones"
       }
     }
   },
