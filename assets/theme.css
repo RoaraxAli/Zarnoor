@@ -207,6 +207,12 @@ input, select, textarea, button { border-radius: 8px; }
 
 .announcement-center { flex: 1; text-align: center; }
 
+/* Force-hide legacy announcement link buttons (Track order / Search / Account).
+   They must never render, even if an older copy of the section markup is still served. */
+.announcement-bar-wrapper a,
+.announcement-bar-wrapper .announcement-links,
+.announcement-bar-wrapper .announcement-links a { display: none !important; }
+
 @media (max-width: 899px) {
   .announcement-bar-inner { justify-content: center; padding: 7px 12px; }
 }

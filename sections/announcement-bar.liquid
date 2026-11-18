@@ -6,11 +6,7 @@
 <div class="announcement-bar-wrapper" {{ section.shopify_attributes }}>
   <div class="announcement-bar-inner">
     <div class="announcement-item announcement-center">
-      {%- if section.settings.message_url != blank -%}
-        <a href="{{ section.settings.message_url }}">{{ notice_message }}</a>
-      {%- else -%}
-        <span>{{ notice_message }}</span>
-      {%- endif -%}
+      <span>{{ notice_message }}</span>
     </div>
   </div>
 </div>
@@ -25,8 +21,7 @@
       "label": "Announcement text",
       "info": "Leave blank to fall back to Theme settings → Shop → Announcement bar.",
       "default": "Free nationwide delivery · Cash on delivery available — Winter Collection coming soon"
-    },
-    { "type": "url", "id": "message_url", "label": "Announcement link (optional)" }
+    }
   ],
   "presets": [{ "name": "Announcement bar" }]
 }
