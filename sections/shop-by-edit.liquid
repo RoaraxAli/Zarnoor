@@ -39,20 +39,38 @@
         </a>
       {%- endfor -%}
     {%- else -%}
+      {%- comment -%}
+        Auto-list. Collections have no creation date in Liquid, so each one is
+        keyed by the created_at of its newest product and sorted newest-first.
+      {%- endcomment -%}
+      {%- capture collection_keys -%}
+        {%- for collection in collections -%}
+          {%- if collection.handle == 'frontpage' or collection.all_products_count == 0 -%}{%- continue -%}{%- endif -%}
+          {%- assign newest_product = collection.products | sort: 'created_at' | last -%}
+          {{- newest_product.created_at | date: '%s' -}}|{{- collection.handle -}}~
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- assign collection_keys = collection_keys | split: '~' | sort | reverse -%}
       {%- assign shown = 0 -%}
-      {%- for collection in collections -%}
-        {%- if collection.handle == 'frontpage' or collection.all_products_count == 0 -%}{%- continue -%}{%- endif -%}
+      {%- for key in collection_keys -%}
         {%- if shown >= section.settings.limit -%}{%- break -%}{%- endif -%}
-        {%- assign shown = shown | plus: 1 -%}
-        <a class="edit-card" href="{{ collection.url }}">
-          {%- if collection.image != blank -%}
-            <img src="{{ collection.image | image_url: width: 800 }}" alt="{{ collection.title | escape }}" loading="lazy" width="800" height="1200">
-          {%- elsif collection.products.first.featured_image -%}
-            <img src="{{ collection.products.first.featured_image | image_url: width: 800 }}" alt="{{ collection.title | escape }}" loading="lazy" width="800" height="1200">
-          {%- endif -%}
-          <span class="edit-card-title">{{ collection.title }}</span>
-          <span class="edit-card-cta">Shop {{ collection.title | downcase }} <b>→</b></span>
-        </a>
+        {%- assign key_parts = key | split: '|' -%}
+        {%- assign wanted_handle = key_parts[1] -%}
+        {%- for collection in collections -%}
+          {%- if collection.handle != wanted_handle -%}{%- continue -%}{%- endif -%}
+          {%- if collection.all_products_count == 0 -%}{%- break -%}{%- endif -%}
+          {%- assign shown = shown | plus: 1 -%}
+          <a class="edit-card" href="{{ collection.url }}">
+            {%- if collection.image != blank -%}
+              <img src="{{ collection.image | image_url: width: 800 }}" alt="{{ collection.title | escape }}" loading="lazy" width="800" height="1200">
+            {%- elsif collection.products.first.featured_image -%}
+              <img src="{{ collection.products.first.featured_image | image_url: width: 800 }}" alt="{{ collection.title | escape }}" loading="lazy" width="800" height="1200">
+            {%- endif -%}
+            <span class="edit-card-title">{{ collection.title }}</span>
+            <span class="edit-card-cta">Shop {{ collection.title | downcase }} <b>→</b></span>
+          </a>
+          {%- break -%}
+        {%- endfor -%}
       {%- endfor -%}
     {%- endif -%}
   </div>
@@ -66,7 +84,7 @@
     { "type": "text", "id": "title", "label": "Heading", "default": "Find your kind of beautiful." },
     { "type": "text", "id": "link_label", "label": "Header link label", "default": "All collections" },
     { "type": "url", "id": "link_url", "label": "Header link URL" },
-    { "type": "range", "id": "limit", "label": "Auto-list: collections to show", "min": 2, "max": 6, "step": 1, "default": 3 }
+    { "type": "range", "id": "limit", "label": "Auto-list: collections to show", "info": "Newest collection (by its newest product) first. Cards added in the editor keep their own drag order.", "min": 2, "max": 6, "step": 1, "default": 3 }
   ],
   "blocks": [
     {
