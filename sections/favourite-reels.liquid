@@ -1,0 +1,135 @@
+{%- assign reels_rendered = 0 -%}
+{%- for block in section.blocks -%}
+  {%- if block.settings.video != blank or block.settings.video_url != blank -%}
+    {%- assign reels_rendered = reels_rendered | plus: 1 -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if reels_rendered > 0 or request.design_mode -%}
+<section id="favourite-reels" class="favourite-reels" {{ section.shopify_attributes }}>
+  <div class="favourite-reels-inner">
+    <div class="favourite-reels-head">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="favourite-reels-eyebrow">{{ section.settings.eyebrow }}</span>
+      {%- endif -%}
+      <h2 class="favourite-reels-title">{{ section.settings.title | default: "Favourite Ones" }}</h2>
+      {%- if section.settings.subtitle != blank -%}
+        <p class="favourite-reels-sub">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="favourite-reels-grid">
+      {%- for block in section.blocks -%}
+        {%- assign reel_link = block.settings.link | default: block.settings.product.url -%}
+        {%- assign reel_label = block.settings.title | default: block.settings.product.title | default: "Zarnoor reel" -%}
+        {%- if block.settings.video != blank or block.settings.video_url != blank or request.design_mode -%}
+          {%- if reel_link != blank -%}<a class="favourite-reel" href="{{ reel_link }}" aria-label="{{ reel_label | escape }}" {{ block.shopify_attributes }}>{%- else -%}<div class="favourite-reel" {{ block.shopify_attributes }}>{%- endif -%}
+            <div class="favourite-reel-media">
+              {%- if block.settings.video != blank -%}
+                {{ block.settings.video | video_tag: image_size: '800x', autoplay: true, loop: true, muted: true, controls: false, playsinline: true, class: 'favourite-reel-video' }}
+              {%- elsif block.settings.video_url != blank -%}
+                <video class="favourite-reel-video" src="{{ block.settings.video_url }}" autoplay loop muted playsinline preload="metadata"{% if block.settings.poster != blank %} poster="{{ block.settings.poster | image_url: width: 800 }}"{% endif %}></video>
+              {%- else -%}
+                {%- if block.settings.poster != blank -%}
+                  <img class="favourite-reel-video" src="{{ block.settings.poster | image_url: width: 800 }}" alt="{{ reel_label | escape }}" width="800" height="1422" loading="lazy">
+                {%- else -%}
+                  <div class="favourite-reel-empty"><span>Add a reel</span></div>
+                {%- endif -%}
+              {%- endif -%}
+              <span class="favourite-reel-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+              </span>
+            </div>
+          {%- if reel_link != blank -%}</a>{%- else -%}</div>{%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_follow -%}
+      <div class="favourite-reels-foot">
+        <a class="favourite-reels-follow" href="{{ section.settings.instagram_url | default: 'https://www.instagram.com/zarnoorbyukash/' }}" target="_blank" rel="noopener">
+          {{ section.settings.follow_label | default: "Follow along on Instagram" }}
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  #favourite-reels { padding: clamp(36px, 5vw, 68px) clamp(18px, 5vw, 72px); background: #ffffff; border-top: 1px solid #ece5dc; }
+  #favourite-reels .favourite-reels-inner { max-width: var(--max); margin: 0 auto; }
+  #favourite-reels .favourite-reels-head { display: grid; gap: 6px; margin: 0 0 26px; }
+  #favourite-reels .favourite-reels-eyebrow { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: #8a7a72; }
+  #favourite-reels .favourite-reels-title { margin: 0; font-size: clamp(22px, 3vw, 34px); line-height: 1.15; color: #302724; }
+  #favourite-reels .favourite-reels-sub { margin: 2px 0 0; max-width: 46ch; font-size: 12px; line-height: 1.6; color: #6d605a; }
+  #favourite-reels .favourite-reels-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  #favourite-reels .favourite-reel { display: block; position: relative; text-decoration: none; border-radius: 3px; overflow: hidden; background: #eee8e0; }
+  #favourite-reels .favourite-reel-media { position: relative; aspect-ratio: 9 / 16; background: #eee8e0; }
+  #favourite-reels .favourite-reel-video { width: 100%; height: 100%; display: block; object-fit: cover; }
+  #favourite-reels .favourite-reel-empty { width: 100%; height: 100%; display: grid; place-items: center; border: 1px dashed #d8d0c7; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #a3968d; }
+  #favourite-reels .favourite-reel-badge { position: absolute; left: 10px; bottom: 10px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, .82); color: #512536; }
+  #favourite-reels .favourite-reel-badge svg { width: 11px; height: 11px; }
+  #favourite-reels .favourite-reel:hover .favourite-reel-media { transform: scale(1.015); }
+  #favourite-reels .favourite-reel-media { transition: transform .4s ease; }
+  #favourite-reels .favourite-reel:focus-visible { outline: 2px solid #7d2439; outline-offset: 3px; }
+  #favourite-reels .favourite-reels-foot { margin-top: 26px; display: flex; justify-content: center; }
+  #favourite-reels .favourite-reels-follow { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #512536; text-decoration: underline; text-underline-offset: 4px; }
+  @media (min-width: 750px) { #favourite-reels .favourite-reels-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } }
+  @media (prefers-reduced-motion: reduce) { #favourite-reels .favourite-reel-media { transition: none; } }
+</style>
+
+<script>
+  (() => {
+    const section = document.getElementById("favourite-reels");
+    if (!section) return;
+    section.querySelectorAll("video.favourite-reel-video").forEach((video) => {
+      video.muted = true;
+      video.setAttribute("muted", "");
+      video.setAttribute("playsinline", "");
+      const play = () => { const p = video.play(); if (p && p.catch) p.catch(() => {}); };
+      play();
+      video.addEventListener("touchstart", play, { once: true, passive: true });
+    });
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Favourite Ones (reels)",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "In motion" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Favourite Ones" },
+    { "type": "textarea", "id": "subtitle", "label": "Subheading", "default": "Four pieces, worn and moving." },
+    { "type": "checkbox", "id": "show_follow", "label": "Show Instagram follow link", "default": true },
+    { "type": "text", "id": "follow_label", "label": "Follow link label", "default": "Follow along on Instagram" },
+    { "type": "url", "id": "instagram_url", "label": "Instagram URL", "info": "Defaults to instagram.com/zarnoorbyukash" }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Reel",
+      "settings": [
+        { "type": "video", "id": "video", "label": "Reel video", "info": "Upload or pick a video from Shopify Files. It plays muted on a loop." },
+        { "type": "url", "id": "video_url", "label": "Or a direct MP4 URL", "info": "Only if the video is not in Shopify Files." },
+        { "type": "image_picker", "id": "poster", "label": "Cover image (optional)", "info": "Shown before the video loads, and used if no video is set." },
+        { "type": "product", "id": "product", "label": "Product (optional)", "info": "Tapping the reel opens this product." },
+        { "type": "url", "id": "link", "label": "Or a custom link", "info": "Overrides the product link." },
+        { "type": "text", "id": "title", "label": "Accessibility label", "info": "Describe the reel, e.g. 'Mehfil e Noor in gold'." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Favourite Ones (reels)",
+      "blocks": [
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" }
+      ]
+    }
+  ]
+}
+{% endschema %}

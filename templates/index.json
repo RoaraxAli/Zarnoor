@@ -61,19 +61,6 @@
         "empty_text": "Add the best-seller tag to products to feature them here."
       }
     },
-    "new_arrivals": {
-      "type": "new-arrivals",
-      "settings": {
-        "eyebrow": "Just landed",
-        "title": "New arrivals",
-        "collection": "all",
-        "tag": "new-arrivals",
-        "products_to_show": 8,
-        "show_view_all": true,
-        "empty_heading": "New arrivals are coming soon",
-        "empty_text": "Add the new-arrivals tag to products to feature them here."
-      }
-    },
     "shop_by_edit": {
       "type": "shop-by-edit",
       "settings": {
@@ -94,6 +81,41 @@
         "empty_heading": "No pieces yet",
         "empty_text": "Choose a collection in the theme editor to show pieces here."
       }
+    },
+    "favourite_reels": {
+      "type": "favourite-reels",
+      "blocks": {
+        "reel_1": {
+          "type": "reel",
+          "settings": {}
+        },
+        "reel_2": {
+          "type": "reel",
+          "settings": {}
+        },
+        "reel_3": {
+          "type": "reel",
+          "settings": {}
+        },
+        "reel_4": {
+          "type": "reel",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "reel_1",
+        "reel_2",
+        "reel_3",
+        "reel_4"
+      ],
+      "settings": {
+        "eyebrow": "In motion",
+        "title": "Favourite Ones",
+        "subtitle": "Four pieces, worn and moving.",
+        "show_follow": true,
+        "follow_label": "Follow along on Instagram",
+        "instagram_url": ""
+      }
     }
   },
   "order": [
@@ -101,6 +123,6 @@
     "best_sellers",
     "shop_by_edit",
     "featured_products",
-    "new_arrivals"
+    "favourite_reels"
   ]
 }
