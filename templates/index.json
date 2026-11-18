@@ -87,19 +87,43 @@
       "blocks": {
         "reel_1": {
           "type": "reel",
-          "settings": {}
+          "settings": {
+            "video": "shopify://files/videos/zarnoor-reel-3.mp4",
+            "video_url": "",
+            "product": "",
+            "link": "",
+            "title": ""
+          }
         },
         "reel_2": {
           "type": "reel",
-          "settings": {}
+          "settings": {
+            "video": "shopify://files/videos/zarnoor-reel-4.mp4",
+            "video_url": "",
+            "product": "",
+            "link": "",
+            "title": ""
+          }
         },
         "reel_3": {
           "type": "reel",
-          "settings": {}
+          "settings": {
+            "video": "shopify://files/videos/zarnoor-reel-1.mp4",
+            "video_url": "",
+            "product": "",
+            "link": "",
+            "title": ""
+          }
         },
         "reel_4": {
           "type": "reel",
-          "settings": {}
+          "settings": {
+            "video": "shopify://files/videos/zarnoor-reel-2.mp4",
+            "video_url": "",
+            "product": "",
+            "link": "",
+            "title": ""
+          }
         }
       },
       "block_order": [
