@@ -151,9 +151,9 @@
         <a class="footer-credit-link" href="{{ section.settings.credit_url | default: "https://withmiszil.com/" }}" target="_blank" rel="noopener nofollow">
           <span class="footer-credit-text">{{ section.settings.credit_prefix | default: "Designed and made by" }}</span>
           {%- if section.settings.credit_logo != blank -%}
-            <img class="footer-credit-logo" src="{{ section.settings.credit_logo | image_url: width: 300 }}" alt="{{ section.settings.credit_alt | default: "WithMiszil" }}" width="300" height="272" loading="lazy" decoding="async">
+            <img class="footer-credit-logo" src="{{ section.settings.credit_logo | image_url: width: 300 }}" alt="{{ section.settings.credit_alt | default: "WithMiszil" }}" width="600" height="361" loading="lazy" decoding="async">
           {%- else -%}
-            <img class="footer-credit-logo" src="{{ "withmiszil-logo.png" | asset_url }}" alt="{{ section.settings.credit_alt | default: "WithMiszil" }}" width="690" height="110" loading="lazy" decoding="async">
+            <img class="footer-credit-logo" src="{{ "withmiszil-logo.png" | asset_url }}" alt="{{ section.settings.credit_alt | default: "WithMiszil" }}" width="600" height="361" loading="lazy" decoding="async">
           {%- endif -%}
         </a>
       </div>
