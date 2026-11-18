@@ -49,6 +49,8 @@
               <a href="{{ routes.all_products_collection_url }}">Shop</a>
               {%- if pages.faq != blank -%}<a href="{{ pages.faq.url }}">FAQs</a>{%- endif -%}
               {%- if pages.contact != blank -%}<a href="{{ pages.contact.url }}">Contact</a>{%- endif -%}
+              {%- if shop.privacy_policy != blank -%}<a href="{{ shop.privacy_policy.url }}">Privacy</a>{%- endif -%}
+              {%- if shop.terms_of_service != blank -%}<a href="{{ shop.terms_of_service.url }}">Terms</a>{%- endif -%}
             </nav>
           </div>
         {%- endif -%}
@@ -151,18 +153,6 @@
           {%- endif -%}
         </p>
       </div>
-      <div class="footer-payment-badges">
-        {%- assign badges = section.settings.payment_badges | default: 'Cash on delivery, Visa, Mastercard' | split: ',' -%}
-        {%- for badge in badges -%}
-          {%- assign b = badge | strip -%}
-          {%- if b != blank -%}
-            {%- if forloop.first == false -%}{%- endif -%}
-            <span class="payment-badge">{{ b }}</span>
-          {%- endif -%}
-        {%- endfor -%}
-        {% if shop.privacy_policy != blank %}<a class="payment-badge" href="{{ shop.privacy_policy.url }}">Privacy</a>{% endif %}
-        {% if shop.terms_of_service != blank %}<a class="payment-badge" href="{{ shop.terms_of_service.url }}">Terms</a>{% endif %}
-      </div>
     </div>
     {%- if section.settings.show_credit -%}
       <div class="footer-credit">
@@ -193,7 +183,6 @@
     { "type": "url", "id": "instagram_url", "label": "Brand Instagram URL", "info": "Falls back to Theme settings → Social." },
     { "type": "url", "id": "facebook_url", "label": "Brand Facebook URL", "info": "Falls back to Theme settings → Social." },
     { "type": "url", "id": "tiktok_url", "label": "Brand TikTok URL", "info": "Falls back to Theme settings → Social." },
-    { "type": "text", "id": "payment_badges", "label": "Payment badges (comma separated)", "default": "Cash on delivery, Visa, Mastercard" },
     { "type": "checkbox", "id": "show_credit", "label": "Show designer credit", "default": true },
     { "type": "text", "id": "credit_prefix", "label": "Credit text", "default": "Designed and made by" },
     { "type": "image_picker", "id": "credit_logo", "label": "Credit logo (blank = bundled WithMiszil logo)" },
