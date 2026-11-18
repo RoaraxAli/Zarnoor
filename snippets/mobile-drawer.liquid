@@ -58,9 +58,12 @@
 
   <div class="sidebar-footer">
     <div class="sidebar-socials">
-      {% if settings.instagram_url != blank %}<a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
-      {% if settings.facebook_url != blank %}<a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a>{% endif %}
-      {% if settings.tiktok_url != blank %}<a href="{{ settings.tiktok_url }}" target="_blank" rel="noopener">TikTok</a>{% endif %}
+      {%- assign drawer_ig = settings.instagram_url | default: 'https://www.instagram.com/zarnoorbyukash/' -%}
+      {%- assign drawer_fb = settings.facebook_url | default: 'https://www.facebook.com/profile.php?id=61590157529246' -%}
+      {%- assign drawer_tt = settings.tiktok_url | default: 'https://www.tiktok.com/@zarnoorbyukash7' -%}
+      <a href="{{ drawer_ig }}" target="_blank" rel="noopener">Instagram</a>
+      <a href="{{ drawer_fb }}" target="_blank" rel="noopener">Facebook</a>
+      <a href="{{ drawer_tt }}" target="_blank" rel="noopener">TikTok</a>
     </div>
     <div class="sidebar-contact">
       {%- if settings.contact_email != blank -%}<a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a>{%- endif -%}

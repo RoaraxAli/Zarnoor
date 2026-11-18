@@ -5,17 +5,17 @@
         <div class="footer-brand-logo-wrap">
           {% render 'zarnoor-logo' %}
           {%- if section.settings.show_brand_social -%}
-            {%- assign fb_url = section.settings.facebook_url | default: settings.facebook_url -%}
+            {%- assign fb_url = section.settings.facebook_url | default: settings.facebook_url | default: 'https://www.facebook.com/profile.php?id=61590157529246' -%}
             {%- assign ig_url = section.settings.instagram_url | default: settings.instagram_url | default: 'https://www.instagram.com/zarnoorbyukash/' -%}
-            {%- assign tt_url = section.settings.tiktok_url | default: settings.tiktok_url -%}
+            {%- assign tt_url = section.settings.tiktok_url | default: settings.tiktok_url | default: 'https://www.tiktok.com/@zarnoorbyukash7' -%}
             <div class="footer-brand-social">
-              <a class="social-btn" href="{{ fb_url | default: '#' }}" aria-label="Zarnoor on Facebook"{% if fb_url != blank %} target="_blank" rel="noopener"{% endif %}>
+              <a class="social-btn" href="{{ fb_url }}" aria-label="Zarnoor on Facebook" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.4 8.4h2.2V5.5h-2.6c-2.5 0-4.1 1.6-4.1 4.1v1.6H9v3h1.9V21h3.2v-6.8h2.3l.5-3h-2.8V9.7c0-.8.4-1.3 1.3-1.3z"/></svg>
               </a>
               <a class="social-btn" href="{{ ig_url }}" aria-label="Zarnoor on Instagram" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
               </a>
-              <a class="social-btn" href="{{ tt_url | default: '#' }}" aria-label="Zarnoor on TikTok"{% if tt_url != blank %} target="_blank" rel="noopener"{% endif %}>
+              <a class="social-btn" href="{{ tt_url }}" aria-label="Zarnoor on TikTok" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16.6 3h-3.1v11.3a2.4 2.4 0 1 1-2-2.4v-3a5.4 5.4 0 1 0 5.1 5.4V8.7a6.3 6.3 0 0 0 3.4 1V6.6a3.6 3.6 0 0 1-3.4-3.6z"/></svg>
               </a>
             </div>
@@ -180,9 +180,9 @@
     { "type": "text", "id": "contact_value", "label": "Contact value (blank = WhatsApp number)" },
     { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true },
     { "type": "checkbox", "id": "show_brand_social", "label": "Show social icons under the logo", "default": true },
-    { "type": "url", "id": "instagram_url", "label": "Brand Instagram URL", "info": "Falls back to Theme settings → Social." },
-    { "type": "url", "id": "facebook_url", "label": "Brand Facebook URL", "info": "Falls back to Theme settings → Social." },
-    { "type": "url", "id": "tiktok_url", "label": "Brand TikTok URL", "info": "Falls back to Theme settings → Social." },
+    { "type": "url", "id": "instagram_url", "label": "Brand Instagram URL", "info": "Defaults to instagram.com/zarnoorbyukash" },
+    { "type": "url", "id": "facebook_url", "label": "Brand Facebook URL", "info": "Defaults to the Zarnoor Facebook profile" },
+    { "type": "url", "id": "tiktok_url", "label": "Brand TikTok URL", "info": "Defaults to tiktok.com/@zarnoorbyukash7" },
     { "type": "checkbox", "id": "show_credit", "label": "Show designer credit", "default": true },
     { "type": "text", "id": "credit_prefix", "label": "Credit text", "default": "Designed and made by" },
     { "type": "image_picker", "id": "credit_logo", "label": "Credit logo (blank = bundled WithMiszil logo)" },
