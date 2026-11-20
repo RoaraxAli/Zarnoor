@@ -71,8 +71,19 @@
       showSlide(Number(dot.dataset.heroDot));
       startTimer();
     }));
-    carousel.addEventListener('mouseenter', stopTimer);
-    carousel.addEventListener('mouseleave', startTimer);
+    let hovered = false;
+    carousel.addEventListener('mousemove', () => {
+      if (!hovered) {
+        hovered = true;
+        stopTimer();
+      }
+    });
+    carousel.addEventListener('mouseleave', () => {
+      if (hovered) {
+        hovered = false;
+        startTimer();
+      }
+    });
     carousel.addEventListener('focusin', stopTimer);
     carousel.addEventListener('focusout', (event) => {
       if (!carousel.contains(event.relatedTarget)) startTimer();
