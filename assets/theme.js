@@ -831,7 +831,7 @@
 
       const existing = items.find((i) => String(i.variant_id) === String(selected.id));
       const existingQty = existing ? Number(existing.quantity) || 0 : 0;
-      console.log('submit stock check:', { selectedId: selected.id, existingQty, stockCap, requested, items: items.map(i=>({vid:i.variant_id,qty:i.quantity})) });
+      console.log('submit stock check: ' + JSON.stringify({ selectedId: selected.id, existingQty, stockCap, requested, items: items.map(i=>({vid:i.variant_id,qty:i.quantity})) }));
       if (stockCap !== null) {
         const room = Math.max(0, stockCap - existingQty);
         if (room <= 0) {
