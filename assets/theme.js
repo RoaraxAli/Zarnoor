@@ -714,7 +714,7 @@
     const jsonEl = document.getElementById('product-variants-json');
     const variants = jsonEl ? safeJson(jsonEl.textContent) : [];
     const invEl = document.getElementById('product-inventory-json');
-    const inventoryMap = invEl ? (safeJson(invEl.textContent) || {}) : {};
+    let inventoryMap = invEl ? (safeJson(invEl.textContent) || {}) : {};
     const hidden = document.getElementById('selected-variant-id');
     const priceEl = document.getElementById('product-price');
     const compareEl = document.getElementById('product-compare');
@@ -724,6 +724,27 @@
 
     let selected = variants.find((v) => String(v.id) === String(hidden.value)) || variants[0];
     let stockCap = null;
+
+    // inventory_management/quantity are not always present in the rendered variant
+    // JSON, so fetch them from Shopify's AJAX product endpoint as a fallback.
+    (function fetchInventory() {
+      const match = window.location.pathname.match(/\/products\/([^\/\?]+)/);
+      const handle = match ? match[1] : null;
+      if (!handle) return;
+      fetch('/products/' + handle + '.js', { headers: { Accept: 'application/json' } })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!data || !Array.isArray(data.variants)) return;
+          data.variants.forEach((v) => {
+            inventoryMap[String(v.id)] = {
+              qty: Number(v.inventory_quantity),
+              tracked: !!v.inventory_management
+            };
+          });
+          if (selected) update(selected);
+        })
+        .catch(() => { /* keep Liquid-provided map */ });
+    })();
 
     function stockOf(variant) {
       if (!variant) return null;
@@ -831,7 +852,6 @@
 
       const existing = items.find((i) => String(i.variant_id) === String(selected.id));
       const existingQty = existing ? Number(existing.quantity) || 0 : 0;
-      console.log('submit stock check: ' + JSON.stringify({ selectedId: selected.id, existingQty, stockCap, requested, items: items.map(i=>({vid:i.variant_id,qty:i.quantity})) }));
       if (stockCap !== null) {
         const room = Math.max(0, stockCap - existingQty);
         if (room <= 0) {
