@@ -26,20 +26,42 @@
   single reference or a list, so take the first entry either way.
 {%- endcomment -%}
 {%- assign colour_patterns = product.metafields.shopify['color-pattern'].value -%}
+{%- if colour_patterns == blank -%}
+  {%- assign colour_patterns = product.metafields.shopify['color-pattern'] -%}
+{%- endif -%}
 {%- if colour_patterns != blank -%}
   {%- assign colour_pattern = colour_patterns.first | default: colour_patterns -%}
-  {%- comment -%} Metaobject fields are metafield drops, so read .value first. {%- endcomment -%}
-  {%- assign colour_pattern_label = colour_pattern.label.value | default: colour_pattern.label -%}
-  {%- assign colour_pattern_label = colour_pattern_label | append: '' | strip -%}
-  {%- if colour_pattern_label != blank -%}
-    {%- assign colour_label = colour_pattern_label -%}
+
+  {%- comment -%}
+    The same value can arrive as a metaobject, a metafield drop or a plain
+    string depending on the theme API version, so every known name is tried.
+  {%- endcomment -%}
+  {%- assign pattern_label = colour_pattern.label.value | default: colour_pattern.label -%}
+  {%- if pattern_label == blank -%}{%- assign pattern_label = colour_pattern.display_name.value | default: colour_pattern.display_name -%}{%- endif -%}
+  {%- if pattern_label == blank -%}{%- assign pattern_label = colour_pattern.name.value | default: colour_pattern.name -%}{%- endif -%}
+  {%- if pattern_label == blank -%}{%- assign pattern_label = colour_pattern.system.title.value | default: colour_pattern.system.title -%}{%- endif -%}
+  {%- if pattern_label == blank -%}
+    {%- comment -%} Some API versions hand back the label string itself. {%- endcomment -%}
+    {%- capture pattern_label -%}{{ colour_patterns }}{%- endcapture -%}
   {%- endif -%}
+  {%- assign pattern_label = pattern_label | append: '' | strip -%}
+  {%- assign pattern_label_head = pattern_label | slice: 0, 1 -%}
+  {%- unless pattern_label == blank or pattern_label contains '(' or pattern_label_head == '#' -%}
+    {%- assign colour_label = pattern_label -%}
+  {%- endunless -%}
+
   {%- capture pattern_raw -%}{{ colour_pattern.color.value }}{%- endcapture -%}
   {%- assign pattern_raw = pattern_raw | strip -%}
   {%- if pattern_raw == blank -%}
     {%- capture pattern_raw -%}{{ colour_pattern.color }}{%- endcapture -%}
     {%- assign pattern_raw = pattern_raw | strip -%}
   {%- endif -%}
+  {%- assign pattern_head = pattern_raw | slice: 0, 1 -%}
+  {%- unless pattern_raw contains '(' or pattern_head == '#' -%}
+    {%- capture pattern_hex -%}{{ colour_pattern.color.value | color_to_hex }}{%- endcapture -%}
+    {%- assign pattern_hex = pattern_hex | strip -%}
+    {%- if pattern_hex != blank -%}{%- assign pattern_raw = pattern_hex -%}{%- endif -%}
+  {%- endunless -%}
   {%- assign pattern_head = pattern_raw | slice: 0, 1 -%}
   {%- if pattern_raw contains '(' or pattern_head == '#' -%}
     {%- assign category_hex = pattern_raw -%}
