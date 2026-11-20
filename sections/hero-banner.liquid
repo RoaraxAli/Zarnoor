@@ -33,7 +33,6 @@
 
   {%- if section.blocks.size > 1 -%}
   <div class="hero-carousel-controls" aria-label="Carousel controls">
-    <button class="hero-carousel-arrow" type="button" data-hero-prev aria-label="Previous banner">&#8592;</button>
     <div class="hero-carousel-dots" role="group" aria-label="Choose a banner">
       {%- if section.blocks.size > 0 -%}
         {%- for block in section.blocks -%}
@@ -43,7 +42,6 @@
         {%- endfor -%}
       {%- endif -%}
     </div>
-    <button class="hero-carousel-arrow" type="button" data-hero-next aria-label="Next banner">&#8594;</button>
   </div>
   {%- endif -%}
 </section>
@@ -80,10 +78,6 @@
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       timer = window.setInterval(function () { showSlide(activeIndex + 1); }, 3000);
     }
-    var previous = carousel.querySelector('[data-hero-prev]');
-    var next = carousel.querySelector('[data-hero-next]');
-    if (previous) previous.addEventListener('click', function () { showSlide(activeIndex - 1); startTimer(); });
-    if (next) next.addEventListener('click', function () { showSlide(activeIndex + 1); startTimer(); });
     dots.forEach(function (dot) {
       dot.addEventListener('click', function () { showSlide(Number(dot.dataset.heroDot)); startTimer(); });
     });

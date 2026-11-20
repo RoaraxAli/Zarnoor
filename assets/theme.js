@@ -65,10 +65,6 @@
       }
     }
 
-    const previous = carousel.querySelector('[data-hero-prev]');
-    const next = carousel.querySelector('[data-hero-next]');
-    if (previous) previous.addEventListener('click', () => { showSlide(activeIndex - 1); startTimer(); });
-    if (next) next.addEventListener('click', () => { showSlide(activeIndex + 1); startTimer(); });
     dots.forEach((dot) => dot.addEventListener('click', () => {
       showSlide(Number(dot.dataset.heroDot));
       startTimer();
