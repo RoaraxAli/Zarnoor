@@ -29,6 +29,8 @@
   function initHeroCarousel() {
     const carousel = document.querySelector('[data-hero-carousel]');
     if (!carousel) return;
+    if (carousel.dataset.heroInitialized === '1') return;
+    carousel.dataset.heroInitialized = '1';
 
     const slides = Array.from(carousel.querySelectorAll('[data-hero-slide]'));
     const dots = Array.from(carousel.querySelectorAll('[data-hero-dot]'));

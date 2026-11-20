@@ -48,6 +48,64 @@
   {%- endif -%}
 </section>
 
+<script>
+(function () {
+  'use strict';
+  function init() {
+    var carousel = document.querySelector('[data-hero-carousel]');
+    if (!carousel || carousel.dataset.heroInitialized === '1') return;
+    carousel.dataset.heroInitialized = '1';
+    var slides = Array.prototype.slice.call(carousel.querySelectorAll('[data-hero-slide]'));
+    var dots = Array.prototype.slice.call(carousel.querySelectorAll('[data-hero-dot]'));
+    if (slides.length < 2) return;
+    var activeIndex = 0;
+    var timer = null;
+    function showSlide(index) {
+      activeIndex = (index + slides.length) % slides.length;
+      slides.forEach(function (slide, i) {
+        var active = i === activeIndex;
+        slide.classList.toggle('is-active', active);
+        slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+      });
+      dots.forEach(function (dot, i) {
+        var active = i === activeIndex;
+        dot.classList.toggle('is-active', active);
+        if (active) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+    }
+    function stopTimer() { if (timer) { window.clearInterval(timer); timer = null; } }
+    function startTimer() {
+      stopTimer();
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      timer = window.setInterval(function () { showSlide(activeIndex + 1); }, 3000);
+    }
+    var previous = carousel.querySelector('[data-hero-prev]');
+    var next = carousel.querySelector('[data-hero-next]');
+    if (previous) previous.addEventListener('click', function () { showSlide(activeIndex - 1); startTimer(); });
+    if (next) next.addEventListener('click', function () { showSlide(activeIndex + 1); startTimer(); });
+    dots.forEach(function (dot) {
+      dot.addEventListener('click', function () { showSlide(Number(dot.dataset.heroDot)); startTimer(); });
+    });
+    var hovered = false;
+    carousel.addEventListener('mousemove', function () { if (!hovered) { hovered = true; stopTimer(); } });
+    carousel.addEventListener('mouseleave', function () { if (hovered) { hovered = false; startTimer(); } });
+    carousel.addEventListener('focusin', stopTimer);
+    carousel.addEventListener('focusout', function (event) { if (!carousel.contains(event.relatedTarget)) startTimer(); });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startTimer, { once: true });
+    } else {
+      startTimer();
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();
+</script>
+
 {% schema %}
 {
   "name": "Campaign carousel",
