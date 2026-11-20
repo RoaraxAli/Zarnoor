@@ -75,7 +75,6 @@
     function stopTimer() { if (timer) { window.clearInterval(timer); timer = null; } }
     function startTimer() {
       stopTimer();
-      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       timer = window.setInterval(function () { showSlide(activeIndex + 1); }, 3000);
     }
     dots.forEach(function (dot) {
