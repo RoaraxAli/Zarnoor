@@ -2,7 +2,18 @@
 {%- assign fabric = product.metafields.custom.fabric.value | default: product.type -%}
 {%- assign care = product.metafields.custom.care.value -%}
 {%- assign fit = product.metafields.custom.fit.value -%}
-{%- assign related = product.collections.first.products -%}
+{%- comment -%}
+  Recommendations: pool every collection the product belongs to, then widen
+  with the whole catalogue so the row always fills four cards. Cards already
+  rendered are tracked by id so nothing repeats.
+{%- endcomment -%}
+{%- assign related_pool = '' | split: '' -%}
+{%- for collection in product.collections -%}
+  {%- assign related_pool = related_pool | concat: collection.products -%}
+{%- endfor -%}
+{%- if related_pool.size < 5 -%}
+  {%- assign related_pool = related_pool | concat: collections.all.products -%}
+{%- endif -%}
 {%- assign wa_text = 'Hello Zarnoor, I would like to order ' | append: product.title | append: ' — ' | append: shop.url | append: product.url -%}
 
 <div class="product-page">
@@ -222,19 +233,23 @@
     </div>
   </div>
 
-  {%- if related.size > 1 -%}
+  {%- if related_pool.size > 1 -%}
     <section class="related-section">
       <div class="related-head">
         <h2>You may also like</h2>
         <a class="editorial-link" href="{{ product.collections.first.url | default: routes.all_products_collection_url }}">View collection</a>
       </div>
       <div class="products-grid">
+        {%- assign shown_ids = ',' -%}
         {%- assign shown = 0 -%}
-        {%- for item in related -%}
-          {%- if item.id != product.id and shown < 4 -%}
+        {%- for item in related_pool -%}
+          {%- if shown >= 4 -%}{%- break -%}{%- endif -%}
+          {%- assign item_key = ',' | append: item.id | append: ',' -%}
+          {%- unless item.id == product.id or shown_ids contains item_key -%}
             {% render 'product-card', product: item, index: forloop.index %}
+            {%- assign shown_ids = shown_ids | append: item.id | append: ',' -%}
             {%- assign shown = shown | plus: 1 -%}
-          {%- endif -%}
+          {%- endunless -%}
         {%- endfor -%}
       </div>
     </section>
