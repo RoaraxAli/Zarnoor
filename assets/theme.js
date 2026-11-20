@@ -533,7 +533,17 @@
     container.addEventListener('click', (e) => {
       const qtyBtn = e.target.closest('[data-cart-qty]');
       if (qtyBtn) {
-        changeLine(Number(qtyBtn.dataset.line), Number(qtyBtn.dataset.quantity));
+        const line = Number(qtyBtn.dataset.line);
+        let quantity = Number(qtyBtn.dataset.quantity);
+        const item = cartState.items[line - 1];
+        if (item && item.inventory_management && item.inventory_quantity !== undefined && item.inventory_quantity !== null) {
+          if (quantity > item.inventory_quantity) {
+            quantity = item.inventory_quantity;
+            showToast('Only ' + item.inventory_quantity + ' in stock');
+          }
+        }
+        if (quantity < 0) quantity = 0;
+        changeLine(line, quantity);
         return;
       }
       const removeBtn = e.target.closest('[data-cart-remove]');
@@ -576,6 +586,14 @@
   }
 
   async function changeLine(line, quantity) {
+    const item = cartState.items[line - 1];
+    if (item && item.inventory_management && item.inventory_quantity !== undefined && item.inventory_quantity !== null) {
+      if (quantity > item.inventory_quantity) {
+        quantity = item.inventory_quantity;
+        showToast('Only ' + item.inventory_quantity + ' in stock');
+      }
+    }
+    if (quantity < 0) quantity = 0;
     try {
       const res = await fetch('/cart/change.js', {
         method: 'POST',
@@ -633,6 +651,7 @@
         ? '<span class="cart-item-meta">' + escapeHtml(item.variant_title) + '</span>'
         : '';
       const sku = item.sku ? '<span class="cart-item-meta">Code: ' + escapeHtml(item.sku) + '</span>' : '';
+      const atStock = item.inventory_management && item.inventory_quantity !== undefined && item.inventory_quantity !== null && item.quantity >= item.inventory_quantity;
       return (
         '<div class="cart-item" data-line="' + (index + 1) + '">' +
           '<a href="' + item.url + '">' +
@@ -647,7 +666,7 @@
           '<div class="cart-item-qty">' +
             '<button type="button" class="qty-btn" data-cart-qty data-line="' + (index + 1) + '" data-quantity="' + (item.quantity - 1) + '" aria-label="Decrease quantity">−</button>' +
             '<span class="qty-num">' + item.quantity + '</span>' +
-            '<button type="button" class="qty-btn" data-cart-qty data-line="' + (index + 1) + '" data-quantity="' + (item.quantity + 1) + '" aria-label="Increase quantity">+</button>' +
+            '<button type="button" class="qty-btn" data-cart-qty data-line="' + (index + 1) + '" data-quantity="' + (item.quantity + 1) + '" aria-label="Increase quantity"' + (atStock ? ' disabled' : '') + '>+</button>' +
           '</div>' +
         '</div>'
       );
@@ -702,6 +721,15 @@
     const skuEl = document.querySelector('.product-sku');
 
     let selected = variants.find((v) => String(v.id) === String(hidden.value)) || variants[0];
+    let stockCap = null;
+
+    function stockOf(variant) {
+      if (!variant) return null;
+      const tracked = variant.inventory_management && variant.inventory_management !== null && variant.inventory_management !== '';
+      if (!tracked) return null;
+      const q = Number(variant.inventory_quantity);
+      return Number.isFinite(q) && q >= 0 ? q : null;
+    }
 
     const update = (variant) => {
       if (!variant) return;
@@ -716,12 +744,27 @@
           compareEl.style.display = 'none';
         }
       }
-      if (stockEl) stockEl.textContent = variant.available ? 'In stock' : 'Sold out';
+      stockCap = stockOf(variant);
+      const inStock = variant.available && (stockCap === null || stockCap > 0);
+      if (stockEl) stockEl.textContent = variant.available
+        ? (stockCap !== null ? 'In stock (' + stockCap + ')' : 'In stock')
+        : 'Sold out';
       if (addBtn) {
-        addBtn.disabled = !variant.available;
-        addBtn.textContent = variant.available ? 'Add to bag' : 'Sold out';
+        addBtn.disabled = !inStock;
+        addBtn.textContent = inStock ? 'Add to bag' : 'Sold out';
       }
       if (skuEl && variant.sku) skuEl.textContent = 'Code: ' + variant.sku;
+
+      if (qty) {
+        if (stockCap !== null && stockCap > 0) {
+          qty.setAttribute('max', String(stockCap));
+        } else {
+          qty.removeAttribute('max');
+        }
+        const current = Number(qty.value) || 1;
+        if (stockCap !== null && current > stockCap) qty.value = Math.max(1, stockCap);
+        if (plus) plus.disabled = stockCap !== null && Number(qty.value) >= stockCap;
+      }
 
       document.querySelectorAll('.option-value').forEach((btn) => {
         const position = Number(btn.dataset.optionPosition) - 1;
@@ -752,13 +795,30 @@
     const qty = document.getElementById('product-qty');
     const minus = document.querySelector('[data-qty-minus]');
     const plus = document.querySelector('[data-qty-plus]');
-    if (minus) minus.addEventListener('click', () => { if (qty) qty.value = Math.max(1, Number(qty.value) - 1); });
-    if (plus) plus.addEventListener('click', () => { if (qty) qty.value = Number(qty.value) + 1; });
+    function clampQty() {
+      if (!qty) return;
+      let v = Number(qty.value);
+      if (!Number.isFinite(v) || v < 1) v = 1;
+      if (stockCap !== null && v > stockCap) v = Math.max(1, stockCap);
+      qty.value = v;
+      if (plus) plus.disabled = stockCap !== null && v >= stockCap;
+    }
+    if (minus) minus.addEventListener('click', () => { if (qty) { qty.value = Math.max(1, Number(qty.value) - 1); clampQty(); } });
+    if (plus) plus.addEventListener('click', () => { if (qty) { qty.value = Number(qty.value) + 1; clampQty(); } });
+    if (qty) qty.addEventListener('input', clampQty);
+    if (qty) qty.addEventListener('change', clampQty);
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!selected || !selected.available) return;
-      addToCart(selected.id, Number(qty ? qty.value : 1), addBtn);
+      clampQty();
+      const requested = Number(qty ? qty.value : 1);
+      if (stockCap !== null && requested > stockCap) {
+        showToast('Only ' + stockCap + ' in stock');
+        if (qty) qty.value = Math.max(1, stockCap);
+        return;
+      }
+      addToCart(selected.id, Math.max(1, requested), addBtn);
     });
   }
 
