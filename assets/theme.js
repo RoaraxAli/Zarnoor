@@ -810,16 +810,28 @@
     if (qty) qty.addEventListener('input', clampQty);
     if (qty) qty.addEventListener('change', clampQty);
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!selected || !selected.available) return;
       clampQty();
       let requested = Number(qty ? qty.value : 1);
       if (!Number.isFinite(requested) || requested < 1) requested = 1;
 
-      // account for what is already in the bag for this variant
-      const existing = (cartState.items || []).find((i) => String(i.variant_id) === String(selected.id));
+      // fetch a fresh cart so the stock check reflects the latest bag
+      let items = cartState.items || [];
+      try {
+        const res = await fetch('/cart.js', { headers: { Accept: 'application/json' } });
+        if (res.ok) {
+          const fresh = await res.json();
+          cartState = fresh;
+          items = fresh.items || [];
+          renderCartUI(cartState);
+        }
+      } catch (err) { /* fall back to cached cartState */ }
+
+      const existing = items.find((i) => String(i.variant_id) === String(selected.id));
       const existingQty = existing ? Number(existing.quantity) || 0 : 0;
+      console.log('submit stock check:', { selectedId: selected.id, existingQty, stockCap, requested, items: items.map(i=>({vid:i.variant_id,qty:i.quantity})) });
       if (stockCap !== null) {
         const room = Math.max(0, stockCap - existingQty);
         if (room <= 0) {
