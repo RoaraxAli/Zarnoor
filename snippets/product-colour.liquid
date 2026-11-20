@@ -5,9 +5,10 @@
   Label resolution order (first non-blank wins):
     1. a product option named Colour / Color  → the label typed on the product
     2. product.metafields.custom.colour_name / custom.color_name
-    3. product.metafields.custom.colour / custom.color, when it is plain text
-    4. a tag written as colour:Purple or color:Purple
-    5. a colour word found in the title or tags
+    3. the "Color: …" line at the top of the product description
+    4. product.metafields.custom.colour / custom.color, when it is plain text
+    5. a tag written as colour:Purple or color:Purple
+    6. a colour word found in the title or tags
 
   Hex resolution order:
     1. product.metafields.custom.colour_hex / custom.color_hex
@@ -30,6 +31,24 @@
 
 {%- if colour_label == blank -%}
   {%- assign colour_label = product.metafields.custom.colour_name.value | default: product.metafields.custom.color_name.value | default: '' -%}
+{%- endif -%}
+
+{%- comment -%}
+  The name typed on the product itself — the "Color: Rich Crimson Pink" line
+  that the import put at the top of the description — beats any tag or guess.
+{%- endcomment -%}
+{%- if colour_label == blank and product.description contains 'olor' -%}
+  {%- assign desc_chunks = product.description | split: '</p>' -%}
+  {%- for chunk in desc_chunks -%}
+    {%- assign probe = chunk | strip_html | strip -%}
+    {%- assign probe_down = probe | downcase -%}
+    {%- assign probe_head6 = probe_down | slice: 0, 6 -%}
+    {%- assign probe_head7 = probe_down | slice: 0, 7 -%}
+    {%- if probe_head6 == 'color:' or probe_head7 == 'colour:' -%}
+      {%- assign colour_label = probe | split: ':' | last | strip -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
 {%- endif -%}
 
 {%- assign colour_meta = product.metafields.custom.colour.value | default: product.metafields.custom.color.value -%}
@@ -116,7 +135,7 @@
 
 {%- if colour_label != blank or colour_meta_css != blank -%}
   <div class="product-colour">
-    <span class="product-colour-label">Colour</span>
+    <span class="product-colour-label">Color</span>
     <span class="product-colour-chip" style="background-color: {{ colour_hex }};"></span>
     {%- if colour_label != blank -%}<span class="product-colour-name">{{ colour_label }}</span>{%- endif -%}
   </div>
