@@ -21,53 +21,85 @@
 {%- assign category_hex = '' -%}
 
 {%- comment -%}
-  Shopify's category metafield Color stores a color-pattern metaobject:
-  label ("Rich Crimson Red"), color (#F61F1F), image, base colour. It may be a
-  single reference or a list, so take the first entry either way.
+  Shopify's category metafield Color is a list of color-pattern metaobjects.
+  Each entry carries a label ("Rich Crimson Red"), a colour (#F61F1F), an
+  image and a base colour. Older/newer API versions disagree on how a list
+  drop is walked (some ignore .first) and on where the fields sit (the entry
+  itself, or the entry's .value), so walk the list with a for loop and try
+  every shape.
 {%- endcomment -%}
 {%- assign colour_patterns = product.metafields.shopify['color-pattern'].value -%}
 {%- if colour_patterns == blank -%}
   {%- assign colour_patterns = product.metafields.shopify['color-pattern'] -%}
 {%- endif -%}
-{%- if colour_patterns != blank -%}
-  {%- assign colour_pattern = colour_patterns.first | default: colour_patterns -%}
+{%- assign colour_pattern = '' -%}
 
-  {%- comment -%}
-    The same value can arrive as a metaobject, a metafield drop or a plain
-    string depending on the theme API version, so every known name is tried.
-  {%- endcomment -%}
-  {%- assign pattern_label = colour_pattern.label.value | default: colour_pattern.label -%}
-  {%- if pattern_label == blank -%}{%- assign pattern_label = colour_pattern.display_name.value | default: colour_pattern.display_name -%}{%- endif -%}
-  {%- if pattern_label == blank -%}{%- assign pattern_label = colour_pattern.name.value | default: colour_pattern.name -%}{%- endif -%}
-  {%- if pattern_label == blank -%}{%- assign pattern_label = colour_pattern.system.title.value | default: colour_pattern.system.title -%}{%- endif -%}
-  {%- if pattern_label == blank -%}
-    {%- comment -%} Some API versions hand back the label string itself. {%- endcomment -%}
-    {%- capture pattern_label -%}{{ colour_patterns }}{%- endcapture -%}
+{%- for pattern_entry in colour_patterns -%}
+  {%- assign pattern = pattern_entry.value | default: pattern_entry -%}
+  {%- assign entry_label = pattern.label.value | default: pattern.label -%}
+  {%- if entry_label == blank -%}{%- assign entry_label = pattern.display_name.value | default: pattern.display_name -%}{%- endif -%}
+  {%- if entry_label == blank -%}{%- assign entry_label = pattern.name.value | default: pattern.name -%}{%- endif -%}
+  {%- if entry_label == blank -%}{%- assign entry_label = pattern.system.title.value | default: pattern.system.title -%}{%- endif -%}
+  {%- if entry_label == blank -%}{%- assign entry_label = pattern_entry.label.value | default: pattern_entry.label -%}{%- endif -%}
+  {%- if entry_label == blank -%}{%- assign entry_label = pattern_entry.display_name.value | default: pattern_entry.display_name -%}{%- endif -%}
+  {%- capture entry_label_txt -%}{{ entry_label }}{%- endcapture -%}
+  {%- assign entry_label_txt = entry_label_txt | strip | remove: '[object Object]' | strip -%}
+  {%- assign entry_label_head = entry_label_txt | slice: 0, 1 -%}
+  {%- if entry_label_head == '#' or entry_label_txt contains '(' -%}
+    {%- assign entry_label_txt = '' -%}
   {%- endif -%}
-  {%- assign pattern_label = pattern_label | append: '' | strip -%}
-  {%- assign pattern_label_head = pattern_label | slice: 0, 1 -%}
-  {%- unless pattern_label == blank or pattern_label contains '(' or pattern_label_head == '#' -%}
-    {%- assign colour_label = pattern_label -%}
+
+  {%- assign entry_hex = pattern.color.value | default: pattern.color -%}
+  {%- if entry_hex == blank -%}{%- assign entry_hex = pattern_entry.color.value | default: pattern_entry.color -%}{%- endif -%}
+  {%- capture entry_hex_txt -%}{{ entry_hex }}{%- endcapture -%}
+  {%- assign entry_hex_txt = entry_hex_txt | strip -%}
+  {%- assign entry_hex_head = entry_hex_txt | slice: 0, 1 -%}
+  {%- unless entry_hex_txt == blank or entry_hex_txt contains '(' or entry_hex_head == '#' -%}
+    {%- capture entry_hex_txt -%}{{ entry_hex | color_to_hex }}{%- endcapture -%}
+    {%- assign entry_hex_txt = entry_hex_txt | strip -%}
   {%- endunless -%}
 
-  {%- capture pattern_raw -%}{{ colour_pattern.color.value }}{%- endcapture -%}
-  {%- assign pattern_raw = pattern_raw | strip -%}
-  {%- if pattern_raw == blank -%}
-    {%- capture pattern_raw -%}{{ colour_pattern.color }}{%- endcapture -%}
-    {%- assign pattern_raw = pattern_raw | strip -%}
+  {%- if entry_label_txt != blank or entry_hex_txt != blank -%}
+    {%- if colour_pattern == '' -%}{%- assign colour_pattern = pattern_entry -%}{%- endif -%}
+    {%- if entry_label_txt != blank -%}{%- assign colour_label = entry_label_txt -%}{%- endif -%}
+    {%- if entry_hex_txt != blank -%}{%- assign category_hex = entry_hex_txt -%}{%- endif -%}
   {%- endif -%}
-  {%- assign pattern_head = pattern_raw | slice: 0, 1 -%}
-  {%- unless pattern_raw contains '(' or pattern_head == '#' -%}
-    {%- capture pattern_hex -%}{{ colour_pattern.color.value | color_to_hex }}{%- endcapture -%}
-    {%- assign pattern_hex = pattern_hex | strip -%}
-    {%- if pattern_hex != blank -%}{%- assign pattern_raw = pattern_hex -%}{%- endif -%}
-  {%- endunless -%}
-  {%- assign pattern_head = pattern_raw | slice: 0, 1 -%}
-  {%- if pattern_raw contains '(' or pattern_head == '#' -%}
-    {%- assign category_hex = pattern_raw -%}
-  {%- elsif pattern_raw.size == 6 -%}
-    {%- assign category_hex = pattern_raw | prepend: '#' -%}
+  {%- if colour_label != blank and category_hex != blank -%}{%- break -%}{%- endif -%}
+{%- endfor -%}
+
+{%- comment -%}
+  A single reference or a bare string iterates as nothing, so fall back to the
+  value itself: the handle (rich-crimson-red) still gives a usable name.
+{%- endcomment -%}
+{%- if colour_pattern == '' and colour_patterns != blank -%}
+  {%- assign colour_pattern = colour_patterns -%}
+{%- endif -%}
+{%- if colour_label == blank and colour_patterns != blank -%}
+  {%- assign pattern_handle = colour_pattern.system.handle.value | default: colour_pattern.system.handle -%}
+  {%- if pattern_handle == blank -%}{%- assign pattern_handle = colour_pattern.handle.value | default: colour_pattern.handle -%}{%- endif -%}
+  {%- capture pattern_handle_txt -%}{{ pattern_handle }}{%- endcapture -%}
+  {%- assign pattern_handle_txt = pattern_handle_txt | strip | remove: '[object Object]' | strip | replace: '_', '-' -%}
+  {%- if pattern_handle_txt == blank -%}
+    {%- capture pattern_handle_txt -%}{{ colour_patterns }}{%- endcapture -%}
+    {%- assign pattern_handle_txt = pattern_handle_txt | strip -%}
+    {%- assign pattern_handle_txt = pattern_handle_txt | remove: 'MetaobjectDrop' | remove: 'Metaobjectlistdrop' | remove: '[object Object]' | remove: '[]' | strip -%}
   {%- endif -%}
+  {%- assign pattern_handle_head = pattern_handle_txt | slice: 0, 1 -%}
+  {%- if pattern_handle_txt contains '-' -%}
+    {%- assign handle_words = pattern_handle_txt | split: '-' -%}
+    {%- capture pattern_handle_txt -%}
+      {%- for word in handle_words -%}{{ word | strip | capitalize }}{%- unless forloop.last %} {% endunless -%}{%- endfor -%}
+    {%- endcapture -%}
+    {%- assign pattern_handle_txt = pattern_handle_txt | strip -%}
+  {%- endif -%}
+  {%- if pattern_handle_txt != blank and pattern_handle_head != '#' and pattern_handle_txt != '#F61F1F' -%}
+    {%- assign colour_label = pattern_handle_txt -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- comment -%} Leave a clue in the page source if the field is present but unreadable. {%- endcomment -%}
+{%- if colour_patterns != blank and colour_label == blank -%}
+  <!-- zarnoor-colour patterns=[{{ colour_patterns }}] entry=[{{ colour_pattern }}] label=[{{ colour_label }}] hex=[{{ category_hex }}] -->
 {%- endif -%}
 
 {%- for option in product.options_with_values -%}
