@@ -12,8 +12,27 @@
   {%- assign related_pool = related_pool | concat: collection.products -%}
 {%- endfor -%}
 {%- if related_pool.size < 5 -%}
-  {%- assign related_pool = related_pool | concat: collections.all.products -%}
+  {%- assign related_pool = related_pool | concat: collections['all'].products -%}
 {%- endif -%}
+{%- if related_pool.size < 5 -%}
+  {%- for handle in 'winter-collection,royal-collection,frontpage' | split: ',' -%}
+    {%- if collections[handle] != blank and collections[handle].products.size > 0 -%}
+      {%- assign related_pool = related_pool | concat: collections[handle].products -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- comment -%} Count products that will actually render (deduped, excluding current). {%- endcomment -%}
+{%- assign related_eligible = 0 -%}
+{%- assign related_ids = ',' -%}
+{%- for item in related_pool -%}
+  {%- assign item_key = ',' | append: item.id | append: ',' -%}
+  {%- unless item.id == product.id or related_ids contains item_key -%}
+    {%- assign related_eligible = related_eligible | plus: 1 -%}
+    {%- assign related_ids = related_ids | append: item.id | append: ',' -%}
+  {%- endunless -%}
+{%- endfor -%}
+
 {%- assign wa_text = 'Hello Zarnoor, I would like to order ' | append: product.title | append: ' — ' | append: shop.url | append: product.url -%}
 
 <div class="product-page">
@@ -233,7 +252,8 @@
     </div>
   </div>
 
-  {%- if related_pool.size > 1 -%}
+  <!-- zarnoor-related pool={{ related_pool.size }} eligible={{ related_eligible }} collections={{ product.collections.size }} all={{ collections['all'].products.size }} -->
+  {%- if related_eligible > 0 -%}
     <section class="related-section">
       <div class="related-head">
         <h2>You may also like</h2>
