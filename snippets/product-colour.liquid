@@ -1,35 +1,64 @@
 {%- comment -%}
   Product colour.
   Shows the piece's colour as a real swatch instead of a "Colour: …" text line.
-  Label resolution order:
-    1. product.metafields.custom.colour / custom.color
-    2. a tag written as colour:Purple or color:Purple
-    3. a colour word found in the title or tags
+
+  Label resolution order (first non-blank wins):
+    1. a product option named Colour / Color  → the label typed on the product
+    2. product.metafields.custom.colour_name / custom.color_name
+    3. product.metafields.custom.colour / custom.color, when it is plain text
+    4. a tag written as colour:Purple or color:Purple
+    5. a colour word found in the title or tags
+
   Hex resolution order:
     1. product.metafields.custom.colour_hex / custom.color_hex
-    2. the built-in palette below
+    2. product.metafields.custom.colour / custom.color when it holds a colour
+    3. the built-in palette below
 {%- endcomment -%}
-{%- assign colour_label = product.metafields.custom.colour.value | default: product.metafields.custom.color.value -%}
+{%- assign colour_label = '' -%}
+
+{%- for option in product.options_with_values -%}
+  {%- assign option_name = option.name | downcase -%}
+  {%- if option_name contains 'color' or option_name contains 'colou' -%}
+    {%- assign option_colour = option.selected_value | default: option.values.first | default: '' | strip -%}
+    {%- assign option_colour_down = option_colour | downcase -%}
+    {%- if option_colour_down != '' and option_colour_down != 'default title' -%}
+      {%- assign colour_label = option_colour -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if colour_label == blank -%}
+  {%- assign colour_label = product.metafields.custom.colour_name.value | default: product.metafields.custom.color_name.value | default: '' -%}
+{%- endif -%}
+
+{%- assign colour_meta = product.metafields.custom.colour.value | default: product.metafields.custom.color.value -%}
+{%- capture colour_meta_raw -%}{{ colour_meta }}{%- endcapture -%}
+{%- assign colour_meta_raw = colour_meta_raw | strip -%}
+{%- assign colour_meta_head = colour_meta_raw | slice: 0, 1 -%}
+
+{%- comment -%} A colour-type metafield prints as #hex or rgb(…), not a name. {%- endcomment -%}
+{%- if colour_meta_raw contains '(' or colour_meta_head == '#' -%}
+  {%- assign colour_meta_css = colour_meta_raw -%}
+{%- elsif colour_meta_raw != blank and colour_label == blank -%}
+  {%- assign colour_label = colour_meta_raw -%}
+{%- endif -%}
 
 {%- if colour_label == blank -%}
   {%- for tag in product.tags -%}
     {%- assign tag_down = tag | downcase | strip -%}
-    {%- if tag_down contains 'colour:' -%}
-      {%- assign colour_label = tag | split: ':' | last | strip -%}
-      {%- break -%}
-    {%- endif -%}
-    {%- if tag_down contains 'color:' -%}
+    {%- if tag_down contains 'colour:' or tag_down contains 'color:' -%}
       {%- assign colour_label = tag | split: ':' | last | strip -%}
       {%- break -%}
     {%- endif -%}
   {%- endfor -%}
 {%- endif -%}
 
-{%- capture colour_haystack -%}{{ product.title }}{%- for tag in product.tags %} {{ tag }}{%- endfor -%}{%- endcapture -%}
+{%- capture colour_haystack -%}{{ product.title }} {{ colour_label }}{%- for tag in product.tags %} {{ tag }}{%- endfor -%}{%- endcapture -%}
 {%- assign colour_haystack = colour_haystack | downcase -%}
 
 {%- if colour_label == blank -%}
-  {%- assign palette_words = 'dusty rose,deep rose,powder blue,petal pink,poison blue,cocoa brown,allure black,golden,champagne,black,purple,maroon,burgundy,red,rose,pink,peach,coco,cocoa,brown,biscotti,beige,cream,ivory,blue,matcha,green,olive,mint,teal,navy,lilac,mustard,silver,grey,gray,white' | split: ',' -%}
+  {%- assign palette_words = 'dusty rose,deep rose,powder blue,petal pink,poison blue,cocoa brown,allure black,golden,champagne,jet black,black,purple,maroon,burgundy,oxblood,crimson,wine,plum,red,rose,mauve,pink,peach,coco,cocoa,mocha,brown,taupe,biscotti,beige,cream,ivory,blue,matcha,sage,green,olive,mint,teal,navy,lavender,lilac,mustard,rust,terracotta,silver,grey,gray,white' | split: ',' -%}
   {%- for word in palette_words -%}
     {%- if colour_haystack contains word -%}
       {%- assign colour_label = word | capitalize -%}
@@ -46,6 +75,10 @@
 {%- endif -%}
 
 {%- assign colour_hex = product.metafields.custom.colour_hex.value | default: product.metafields.custom.color_hex.value -%}
+
+{%- if colour_hex == blank and colour_meta_css != blank -%}
+  {%- assign colour_hex = colour_meta_css -%}
+{%- endif -%}
 
 {%- if colour_hex == blank -%}
   {%- assign colour_key = colour_haystack | append: ' ' | append: colour_label | downcase -%}
@@ -69,15 +102,23 @@
   {%- elsif colour_key contains 'mustard' -%}{%- assign colour_hex = '#c2982f' -%}
   {%- elsif colour_key contains 'silver' or colour_key contains 'grey' or colour_key contains 'gray' -%}{%- assign colour_hex = '#b8b8b8' -%}
   {%- elsif colour_key contains 'ivory' or colour_key contains 'cream' or colour_key contains 'white' -%}{%- assign colour_hex = '#f2ece1' -%}
+  {%- elsif colour_key contains 'oxblood' or colour_key contains 'crimson' -%}{%- assign colour_hex = '#7d1f2b' -%}
+  {%- elsif colour_key contains 'wine' or colour_key contains 'plum' -%}{%- assign colour_hex = '#5a2a4a' -%}
+  {%- elsif colour_key contains 'mauve' -%}{%- assign colour_hex = '#9b7b86' -%}
+  {%- elsif colour_key contains 'mocha' -%}{%- assign colour_hex = '#6f5140' -%}
+  {%- elsif colour_key contains 'taupe' -%}{%- assign colour_hex = '#a2917f' -%}
+  {%- elsif colour_key contains 'sage' -%}{%- assign colour_hex = '#9caf88' -%}
+  {%- elsif colour_key contains 'rust' or colour_key contains 'terracotta' -%}{%- assign colour_hex = '#b4552d' -%}
+  {%- elsif colour_key contains 'lavender' -%}{%- assign colour_hex = '#b3a0cf' -%}
   {%- elsif colour_key contains 'blue' -%}{%- assign colour_hex = '#3d5f8a' -%}
   {%- endif -%}
 {%- endif -%}
 
-{%- if colour_label != blank -%}
+{%- if colour_label != blank or colour_meta_css != blank -%}
   <div class="product-colour">
     <span class="product-colour-label">Colour</span>
     <span class="product-colour-chip" style="background-color: {{ colour_hex }};"></span>
-    <span class="product-colour-name">{{ colour_label }}</span>
+    {%- if colour_label != blank -%}<span class="product-colour-name">{{ colour_label }}</span>{%- endif -%}
   </div>
 
   <style>
