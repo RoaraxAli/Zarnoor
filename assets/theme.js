@@ -713,6 +713,8 @@
 
     const jsonEl = document.getElementById('product-variants-json');
     const variants = jsonEl ? safeJson(jsonEl.textContent) : [];
+    const invEl = document.getElementById('product-inventory-json');
+    const inventoryMap = invEl ? (safeJson(invEl.textContent) || {}) : {};
     const hidden = document.getElementById('selected-variant-id');
     const priceEl = document.getElementById('product-price');
     const compareEl = document.getElementById('product-compare');
@@ -725,9 +727,9 @@
 
     function stockOf(variant) {
       if (!variant) return null;
-      const tracked = variant.inventory_management && variant.inventory_management !== null && variant.inventory_management !== '';
-      if (!tracked) return null;
-      const q = Number(variant.inventory_quantity);
+      const info = inventoryMap[String(variant.id)];
+      if (!info || !info.tracked) return null;
+      const q = Number(info.qty);
       return Number.isFinite(q) && q >= 0 ? q : null;
     }
 
