@@ -23,7 +23,8 @@
 {%- if collections['best-seller'] != blank -%}
   {%- assign related_pool = related_pool | concat: collections['best-seller'].products -%}
 {%- endif -%}
-{%- for handle in 'frontpage' | split: ',' -%}
+{%- assign fallback_handles = 'frontpage' | split: ',' -%}
+{%- for handle in fallback_handles -%}
   {%- if collections[handle] != blank -%}
     {%- assign related_pool = related_pool | concat: collections[handle].products -%}
   {%- endif -%}
