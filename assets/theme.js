@@ -814,12 +814,24 @@
       e.preventDefault();
       if (!selected || !selected.available) return;
       clampQty();
-      const requested = Number(qty ? qty.value : 1);
-      if (stockCap !== null && requested > stockCap) {
-        showToast('Only ' + stockCap + ' in stock');
-        if (qty) qty.value = Math.max(1, stockCap);
-        return;
+      let requested = Number(qty ? qty.value : 1);
+      if (!Number.isFinite(requested) || requested < 1) requested = 1;
+
+      // account for what is already in the bag for this variant
+      const existing = (cartState.items || []).find((i) => String(i.variant_id) === String(selected.id));
+      const existingQty = existing ? Number(existing.quantity) || 0 : 0;
+      if (stockCap !== null) {
+        const room = Math.max(0, stockCap - existingQty);
+        if (room <= 0) {
+          showToast('You already have all ' + stockCap + ' in your bag');
+          return;
+        }
+        if (requested > room) {
+          requested = room;
+          showToast('Only ' + room + ' more can be added (' + stockCap + ' in stock)');
+        }
       }
+      if (stockCap !== null && requested > stockCap) requested = Math.max(1, stockCap);
       addToCart(selected.id, Math.max(1, requested), addBtn);
     });
   }
