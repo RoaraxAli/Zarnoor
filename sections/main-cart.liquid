@@ -48,6 +48,7 @@
                 id="updates_{{ forloop.index }}"
                 value="{{ item.quantity }}"
                 min="0"
+                {%- if item.variant.inventory_management != blank and item.variant.inventory_policy != 'continue' and item.variant.inventory_quantity >= 0 %} max="{{ item.variant.inventory_quantity }}"{%- endif %}
                 inputmode="numeric"
                 class="qty-input"
               >
@@ -70,6 +71,25 @@
     </form>
   {%- endif -%}
 </div>
+
+<script>
+  (function () {
+    var inputs = document.querySelectorAll('.cart-page .qty-input[max]');
+    for (var i = 0; i < inputs.length; i++) {
+      (function (input) {
+        var cap = Number(input.getAttribute('max'));
+        if (!isFinite(cap)) return;
+        function clamp() {
+          var v = Number(input.value);
+          if (!isFinite(v) || v < 0) v = 0;
+          if (v > cap) input.value = cap;
+        }
+        input.addEventListener('input', clamp);
+        input.addEventListener('change', clamp);
+      })(inputs[i]);
+    }
+  })();
+</script>
 
 {% schema %}
 {

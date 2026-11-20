@@ -536,7 +536,7 @@
         const line = Number(qtyBtn.dataset.line);
         let quantity = Number(qtyBtn.dataset.quantity);
         const item = cartState.items[line - 1];
-        if (item && item.inventory_management && item.inventory_quantity !== undefined && item.inventory_quantity !== null) {
+        if (item && item.inventory_management && item.inventory_policy !== 'continue' && item.inventory_quantity !== undefined && item.inventory_quantity !== null) {
           if (quantity > item.inventory_quantity) {
             quantity = item.inventory_quantity;
             showToast('Only ' + item.inventory_quantity + ' in stock');
@@ -553,7 +553,7 @@
     });
   }
 
-  async function addToCart(variantId, quantity, btn) {
+  async function addToCart(variantId, quantity, btn, successMessage, inventoryMap) {
     if (!variantId) return;
     const label = btn ? btn.textContent : '';
     if (btn) {
@@ -571,10 +571,11 @@
         const err = await res.json().catch(() => ({}));
         throw new Error(err.description || 'This piece could not be added.');
       }
+      await clampCartToStock(inventoryMap);
       await syncCart();
       closeQuickView();
       openCartDrawer();
-      showToast('Added to bag');
+      showToast(successMessage || 'Added to bag');
     } catch (error) {
       showToast(error.message);
     } finally {
@@ -587,7 +588,7 @@
 
   async function changeLine(line, quantity) {
     const item = cartState.items[line - 1];
-    if (item && item.inventory_management && item.inventory_quantity !== undefined && item.inventory_quantity !== null) {
+    if (item && item.inventory_management && item.inventory_policy !== 'continue' && item.inventory_quantity !== undefined && item.inventory_quantity !== null) {
       if (quantity > item.inventory_quantity) {
         quantity = item.inventory_quantity;
         showToast('Only ' + item.inventory_quantity + ' in stock');
@@ -615,6 +616,58 @@
       renderCartUI(cartState);
     } catch (error) {
       /* keep the server-rendered cart */
+    }
+  }
+
+  // Shopify's cart API will accept more units than are in stock and only fail
+  // at checkout. Clamp any over-stock line back to the available quantity.
+  function cartStockOf(item, inventoryMap) {
+    const info = inventoryMap && inventoryMap[String(item.variant_id)];
+    if (info && info.tracked) {
+      return { qty: Number(info.qty), oversell: info.policy === 'continue' };
+    }
+    const tracked = typeof item.inventory_management === 'string' && item.inventory_management !== '';
+    if (!tracked) return null;
+    const qty = Number(item.inventory_quantity);
+    if (!Number.isFinite(qty)) return null;
+    return { qty: qty, oversell: item.inventory_policy === 'continue' };
+  }
+
+  async function clampCartToStock(inventoryMap) {
+    let cart;
+    try {
+      const res = await fetch('/cart.js', { headers: { Accept: 'application/json' } });
+      if (!res.ok) return;
+      cart = await res.json();
+    } catch (error) {
+      return;
+    }
+
+    const over = (cart.items || []).filter((item) => {
+      const stock = cartStockOf(item, inventoryMap);
+      return stock && !stock.oversell && Number.isFinite(stock.qty) && stock.qty >= 0 && item.quantity > stock.qty;
+    });
+    if (!over.length) return;
+
+    let adjusted = false;
+    let lowest = Infinity;
+    for (const item of over) {
+      const stock = cartStockOf(item, inventoryMap);
+      if (!stock) continue;
+      const capped = Math.max(0, stock.qty);
+      lowest = Math.min(lowest, capped);
+      try {
+        const res = await fetch('/cart/change.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ id: item.key || item.variant_id, quantity: capped })
+        });
+        if (res.ok) adjusted = true;
+      } catch (error) { /* try the next line */ }
+    }
+
+    if (adjusted) {
+      showToast('Only ' + lowest + ' in stock — your bag was adjusted');
     }
   }
 
@@ -651,7 +704,7 @@
         ? '<span class="cart-item-meta">' + escapeHtml(item.variant_title) + '</span>'
         : '';
       const sku = item.sku ? '<span class="cart-item-meta">Code: ' + escapeHtml(item.sku) + '</span>' : '';
-      const atStock = item.inventory_management && item.inventory_quantity !== undefined && item.inventory_quantity !== null && item.quantity >= item.inventory_quantity;
+      const atStock = item.inventory_management && item.inventory_policy !== 'continue' && item.inventory_quantity !== undefined && item.inventory_quantity !== null && item.quantity >= item.inventory_quantity;
       return (
         '<div class="cart-item" data-line="' + (index + 1) + '">' +
           '<a href="' + item.url + '">' +
@@ -714,45 +767,41 @@
     const jsonEl = document.getElementById('product-variants-json');
     const variants = jsonEl ? safeJson(jsonEl.textContent) : [];
     const invEl = document.getElementById('product-inventory-json');
-    let inventoryMap = invEl ? (safeJson(invEl.textContent) || {}) : {};
+    let inventoryMap = invEl ? safeJson(invEl.textContent) : null;
+    if (!inventoryMap || typeof inventoryMap !== 'object' || Array.isArray(inventoryMap)) {
+      inventoryMap = {};
+    }
+
     const hidden = document.getElementById('selected-variant-id');
     const priceEl = document.getElementById('product-price');
     const compareEl = document.getElementById('product-compare');
     const stockEl = document.getElementById('stock-note');
     const addBtn = document.getElementById('product-add-btn');
     const skuEl = document.querySelector('.product-sku');
+    const qty = document.getElementById('product-qty');
+    const minus = document.querySelector('[data-qty-minus]');
+    const plus = document.querySelector('[data-qty-plus]');
 
-    let selected = variants.find((v) => String(v.id) === String(hidden.value)) || variants[0];
+    let selected = variants.find((v) => String(v.id) === String(hidden ? hidden.value : '')) || variants[0];
     let stockCap = null;
+    let adding = false;
 
-    // inventory_management/quantity are not always present in the rendered variant
-    // JSON, so fetch them from Shopify's AJAX product endpoint as a fallback.
-    (function fetchInventory() {
-      const match = window.location.pathname.match(/\/products\/([^\/\?]+)/);
-      const handle = match ? match[1] : null;
-      if (!handle) return;
-      fetch('/products/' + handle + '.js', { headers: { Accept: 'application/json' } })
-        .then((r) => (r.ok ? r.json() : null))
-        .then((data) => {
-          if (!data || !Array.isArray(data.variants)) return;
-          data.variants.forEach((v) => {
-            inventoryMap[String(v.id)] = {
-              qty: Number(v.inventory_quantity),
-              tracked: !!v.inventory_management
-            };
-          });
-          if (selected) update(selected);
-        })
-        .catch(() => { /* keep Liquid-provided map */ });
-    })();
-
-    function stockOf(variant) {
+    const stockOf = (variant) => {
       if (!variant) return null;
       const info = inventoryMap[String(variant.id)];
       if (!info || !info.tracked) return null;
       const q = Number(info.qty);
       return Number.isFinite(q) && q >= 0 ? q : null;
-    }
+    };
+
+    const clampQty = () => {
+      if (!qty) return;
+      let v = Number(qty.value);
+      if (!Number.isFinite(v) || v < 1) v = 1;
+      if (stockCap !== null && v > stockCap) v = Math.max(1, stockCap);
+      qty.value = v;
+      if (plus) plus.disabled = stockCap !== null && v >= stockCap;
+    };
 
     const update = (variant) => {
       if (!variant) return;
@@ -768,10 +817,12 @@
         }
       }
       stockCap = stockOf(variant);
-      const inStock = variant.available && (stockCap === null || stockCap > 0);
-      if (stockEl) stockEl.textContent = variant.available
-        ? (stockCap !== null ? 'In stock (' + stockCap + ')' : 'In stock')
-        : 'Sold out';
+      const inStock = !!variant.available && (stockCap === null || stockCap > 0);
+      if (stockEl) {
+        stockEl.textContent = !variant.available
+          ? 'Sold out'
+          : (stockCap !== null ? 'In stock (' + stockCap + ')' : 'In stock');
+      }
       if (addBtn) {
         addBtn.disabled = !inStock;
         addBtn.textContent = inStock ? 'Add to bag' : 'Sold out';
@@ -815,56 +866,94 @@
       });
     });
 
-    const qty = document.getElementById('product-qty');
-    const minus = document.querySelector('[data-qty-minus]');
-    const plus = document.querySelector('[data-qty-plus]');
-    function clampQty() {
-      if (!qty) return;
-      let v = Number(qty.value);
-      if (!Number.isFinite(v) || v < 1) v = 1;
-      if (stockCap !== null && v > stockCap) v = Math.max(1, stockCap);
-      qty.value = v;
-      if (plus) plus.disabled = stockCap !== null && v >= stockCap;
-    }
     if (minus) minus.addEventListener('click', () => { if (qty) { qty.value = Math.max(1, Number(qty.value) - 1); clampQty(); } });
     if (plus) plus.addEventListener('click', () => { if (qty) { qty.value = Number(qty.value) + 1; clampQty(); } });
     if (qty) qty.addEventListener('input', clampQty);
     if (qty) qty.addEventListener('change', clampQty);
 
+    // Always apply the stock cap on load, not only after a variant change.
+    update(selected);
+    clampQty();
+
+    // Shopify's public .js endpoint is a fallback for variants missing from the
+    // Liquid map; never overwrite known values with missing ones.
+    (function refreshInventory() {
+      const match = window.location.pathname.match(/\/products\/([^\/\?]+)/);
+      const handle = match ? match[1] : null;
+      if (!handle) return;
+      fetch('/products/' + handle + '.js', { headers: { Accept: 'application/json' } })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!data || !Array.isArray(data.variants)) return;
+          let changed = false;
+          data.variants.forEach((v) => {
+            const hasQuantity = typeof v.inventory_quantity === 'number' && Number.isFinite(v.inventory_quantity);
+            const isTracked = typeof v.inventory_management === 'string' && v.inventory_management !== '';
+            if (!hasQuantity || !isTracked) return;
+            inventoryMap[String(v.id)] = { qty: v.inventory_quantity, tracked: true };
+            changed = true;
+          });
+          if (changed && selected) {
+            update(selected);
+            clampQty();
+          }
+        })
+        .catch(() => { /* keep the Liquid-provided map */ });
+    })();
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!selected || !selected.available) return;
-      clampQty();
-      let requested = Number(qty ? qty.value : 1);
-      if (!Number.isFinite(requested) || requested < 1) requested = 1;
+      if (!selected || !selected.available || adding) return;
+      adding = true;
 
-      // fetch a fresh cart so the stock check reflects the latest bag
-      let items = cartState.items || [];
       try {
-        const res = await fetch('/cart.js', { headers: { Accept: 'application/json' } });
-        if (res.ok) {
-          const fresh = await res.json();
-          cartState = fresh;
-          items = fresh.items || [];
-          renderCartUI(cartState);
-        }
-      } catch (err) { /* fall back to cached cartState */ }
+        // Require a fresh cart for tracked variants; stale state cannot enforce a cap.
+        let items = cartState.items || [];
+        let cartFresh = false;
+        try {
+          const res = await fetch('/cart.js', { headers: { Accept: 'application/json' } });
+          if (res.ok) {
+            const fresh = await res.json();
+            cartState = fresh;
+            items = fresh.items || [];
+            renderCartUI(cartState);
+            cartFresh = true;
+          }
+        } catch (err) { /* handled below for tracked stock */ }
 
-      const existing = items.find((i) => String(i.variant_id) === String(selected.id));
-      const existingQty = existing ? Number(existing.quantity) || 0 : 0;
-      if (stockCap !== null) {
-        const room = Math.max(0, stockCap - existingQty);
-        if (room <= 0) {
-          showToast('You already have all ' + stockCap + ' in your bag');
+        const existing = items.find((i) => String(i.variant_id) === String(selected.id));
+        const existingQty = existing ? Number(existing.quantity) || 0 : 0;
+
+        let cap = stockCap;
+        if (cap === null && existing && existing.inventory_management && existing.inventory_policy !== 'continue' && existing.inventory_quantity !== undefined && existing.inventory_quantity !== null) {
+          const lineQty = Number(existing.inventory_quantity);
+          if (Number.isFinite(lineQty) && lineQty >= 0) cap = lineQty;
+        }
+        if (cap !== null && !cartFresh) {
+          showToast('Could not verify your bag. Please try again.');
           return;
         }
-        if (requested > room) {
-          requested = room;
-          showToast('Only ' + room + ' more can be added (' + stockCap + ' in stock)');
+
+        let requested = Number(qty ? qty.value : 1);
+        if (!Number.isFinite(requested) || requested < 1) requested = 1;
+        let limitedMessage = '';
+
+        if (cap !== null) {
+          const room = Math.max(0, cap - existingQty);
+          if (room <= 0) {
+            showToast('You already have all ' + cap + ' available');
+            return;
+          }
+          if (requested > room) {
+            requested = room;
+            limitedMessage = 'Only ' + room + ' more available (' + cap + ' in stock)';
+          }
         }
+
+        await addToCart(selected.id, Math.max(1, requested), addBtn, limitedMessage, inventoryMap);
+      } finally {
+        adding = false;
       }
-      if (stockCap !== null && requested > stockCap) requested = Math.max(1, stockCap);
-      addToCart(selected.id, Math.max(1, requested), addBtn);
     });
   }
 
