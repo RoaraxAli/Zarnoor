@@ -1,9 +1,10 @@
 <section class="hero-section hero-carousel" aria-label="Featured campaigns" data-hero-carousel aria-roledescription="carousel">
   <div class="hero-carousel-slides">
+    {%- assign hero_slide_index = 0 -%}
     {%- if section.blocks.size > 0 -%}
       {%- for block in section.blocks -%}
         {%- if block.settings.image != blank -%}
-          <div class="hero-carousel-slide{% if forloop.first %} is-active{% endif %}" data-hero-slide{% unless forloop.first %} aria-hidden="true"{% endunless %} {{ block.shopify_attributes }}>
+          <div class="hero-carousel-slide{% if hero_slide_index == 0 %} is-active{% endif %}" data-hero-slide{% if hero_slide_index > 0 %} aria-hidden="true"{% endif %} {{ block.shopify_attributes }}>
             {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" class="hero-carousel-link">{%- endif -%}
             <picture class="hero-carousel-media{% if block.settings.mobile_image != blank %} has-mobile-image{% endif %}">
               {%- if block.settings.mobile_image != blank -%}
@@ -21,11 +22,12 @@
                 alt="{{ block.settings.alt | escape }}"
                 width="{{ block.settings.image.width }}"
                 height="{{ block.settings.image.height }}"
-                {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                {% if hero_slide_index == 0 %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
               >
             </picture>
             {%- if block.settings.link != blank -%}</a>{%- endif -%}
           </div>
+          {%- assign hero_slide_index = hero_slide_index | plus: 1 -%}
         {%- endif -%}
       {%- endfor -%}
     {%- endif -%}
@@ -35,9 +37,11 @@
   <div class="hero-carousel-controls" aria-label="Carousel controls">
     <div class="hero-carousel-dots" role="group" aria-label="Choose a banner">
       {%- if section.blocks.size > 0 -%}
+        {%- assign hero_dot_index = 0 -%}
         {%- for block in section.blocks -%}
           {%- if block.settings.image != blank -%}
-            <button class="hero-carousel-dot{% if forloop.first %} is-active{% endif %}" type="button" data-hero-dot="{{ forloop.index0 }}" aria-label="Show banner {{ forloop.index }}"{% if forloop.first %} aria-current="true"{% endif %}></button>
+            <button class="hero-carousel-dot{% if hero_dot_index == 0 %} is-active{% endif %}" type="button" data-hero-dot="{{ hero_dot_index }}" aria-label="Show banner {{ hero_dot_index | plus: 1 }}"{% if hero_dot_index == 0 %} aria-current="true"{% endif %}></button>
+            {%- assign hero_dot_index = hero_dot_index | plus: 1 -%}
           {%- endif -%}
         {%- endfor -%}
       {%- endif -%}
@@ -49,17 +53,32 @@
 <script>
 (function () {
   'use strict';
+  var INTERVAL = 3000;
+
   function init() {
     var carousel = document.querySelector('[data-hero-carousel]');
-    if (!carousel || carousel.dataset.heroInitialized === '1') return;
-    carousel.dataset.heroInitialized = '1';
+    if (!carousel) return;
+
+    // A single controller per element. Theme editor re-renders and bfcache
+    // restores reuse the same node, so never start a second timer.
+    if (carousel.__zarnoorHero) {
+      carousel.__zarnoorHero.restart();
+      return;
+    }
+
     var slides = Array.prototype.slice.call(carousel.querySelectorAll('[data-hero-slide]'));
     var dots = Array.prototype.slice.call(carousel.querySelectorAll('[data-hero-dot]'));
     if (slides.length < 2) return;
+
     var activeIndex = 0;
     var timer = null;
+
+    slides.forEach(function (slide, i) {
+      if (slide.classList.contains('is-active')) activeIndex = i;
+    });
+
     function showSlide(index) {
-      activeIndex = (index + slides.length) % slides.length;
+      activeIndex = ((index % slides.length) + slides.length) % slides.length;
       slides.forEach(function (slide, i) {
         var active = i === activeIndex;
         slide.classList.toggle('is-active', active);
@@ -72,30 +91,60 @@
         else dot.removeAttribute('aria-current');
       });
     }
-    function stopTimer() { if (timer) { window.clearInterval(timer); timer = null; } }
-    function startTimer() {
-      stopTimer();
-      timer = window.setInterval(function () { showSlide(activeIndex + 1); }, 3000);
+
+    function stop() {
+      if (timer !== null) {
+        window.clearTimeout(timer);
+        timer = null;
+      }
     }
+
+    // A chained timeout keeps a steady 3s cadence even if the browser
+    // throttles a background tab, and never drifts like setInterval.
+    function tick() {
+      timer = null;
+      if (document.hidden) return;
+      showSlide(activeIndex + 1);
+      start();
+    }
+
+    function start() {
+      stop();
+      if (document.hidden) return;
+      timer = window.setTimeout(tick, INTERVAL);
+    }
+
     dots.forEach(function (dot) {
-      dot.addEventListener('click', function () { showSlide(Number(dot.dataset.heroDot)); startTimer(); });
+      dot.addEventListener('click', function () {
+        showSlide(Number(dot.getAttribute('data-hero-dot')) || 0);
+        start();
+      });
     });
-    var hovered = false;
-    carousel.addEventListener('mousemove', function () { if (!hovered) { hovered = true; stopTimer(); } });
-    carousel.addEventListener('mouseleave', function () { if (hovered) { hovered = false; startTimer(); } });
-    carousel.addEventListener('focusin', stopTimer);
-    carousel.addEventListener('focusout', function (event) { if (!carousel.contains(event.relatedTarget)) startTimer(); });
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', startTimer, { once: true });
-    } else {
-      startTimer();
-    }
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop();
+      else start();
+    });
+    window.addEventListener('pageshow', function () { start(); });
+    window.addEventListener('focus', function () { start(); });
+
+    carousel.__zarnoorHero = {
+      restart: start,
+      stop: stop,
+      show: showSlide
+    };
+
+    start();
   }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
     init();
   }
+
+  // Theme editor: re-init when the section is re-rendered.
+  document.addEventListener('shopify:section:load', init);
 })();
 </script>
 

@@ -29,6 +29,12 @@
   function initHeroCarousel() {
     const carousel = document.querySelector('[data-hero-carousel]');
     if (!carousel) return;
+    // The hero section ships its own controller; reuse it instead of starting
+    // a second timer that would double-advance the slides.
+    if (carousel.__zarnoorHero) {
+      carousel.__zarnoorHero.restart();
+      return;
+    }
     if (carousel.dataset.heroInitialized === '1') return;
     carousel.dataset.heroInitialized = '1';
 
@@ -37,10 +43,14 @@
     if (slides.length < 2) return;
 
     let activeIndex = 0;
-    let timer;
+    let timer = null;
+
+    slides.forEach((slide, i) => {
+      if (slide.classList.contains('is-active')) activeIndex = i;
+    });
 
     function showSlide(index) {
-      activeIndex = (index + slides.length) % slides.length;
+      activeIndex = ((index % slides.length) + slides.length) % slides.length;
       slides.forEach((slide, i) => {
         const active = i === activeIndex;
         slide.classList.toggle('is-active', active);
@@ -54,37 +64,41 @@
       });
     }
 
-    function stopTimer() {
-      window.clearInterval(timer);
+    function stop() {
+      if (timer !== null) {
+        window.clearTimeout(timer);
+        timer = null;
+      }
     }
 
-    function startTimer() {
-      stopTimer();
-      timer = window.setInterval(() => showSlide(activeIndex + 1), 3000);
+    function tick() {
+      timer = null;
+      if (document.hidden) return;
+      showSlide(activeIndex + 1);
+      start();
     }
 
-    dots.forEach((dot) => dot.addEventListener('click', () => {
-      showSlide(Number(dot.dataset.heroDot));
-      startTimer();
-    }));
-    let hovered = false;
-    carousel.addEventListener('mousemove', () => {
-      if (!hovered) {
-        hovered = true;
-        stopTimer();
-      }
+    function start() {
+      stop();
+      if (document.hidden) return;
+      timer = window.setTimeout(tick, 3000);
+    }
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        showSlide(Number(dot.getAttribute('data-hero-dot')) || 0);
+        start();
+      });
     });
-    carousel.addEventListener('mouseleave', () => {
-      if (hovered) {
-        hovered = false;
-        startTimer();
-      }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+      else start();
     });
-    carousel.addEventListener('focusin', stopTimer);
-    carousel.addEventListener('focusout', (event) => {
-      if (!carousel.contains(event.relatedTarget)) startTimer();
-    });
-    startTimer();
+    window.addEventListener('pageshow', start);
+
+    carousel.__zarnoorHero = { restart: start, stop, show: showSlide };
+    start();
   }
 
   /* ---------------- Drawers ---------------- */
