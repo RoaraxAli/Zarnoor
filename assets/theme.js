@@ -59,7 +59,7 @@
     function startTimer() {
       stopTimer();
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        timer = window.setInterval(() => showSlide(activeIndex + 1), 5500);
+        timer = window.setInterval(() => showSlide(activeIndex + 1), 3000);
       }
     }
 
