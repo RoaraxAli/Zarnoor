@@ -7,28 +7,12 @@
   with the whole catalogue so the row always fills four cards. Cards already
   rendered are tracked by id so nothing repeats.
 {%- endcomment -%}
-{%- assign related_pool = '' | split: '' -%}
-{%- for collection in product.collections -%}
-  {%- assign related_pool = related_pool | concat: collection.products -%}
-{%- endfor -%}
-{%- if collections['all'] != blank -%}
-  {%- assign related_pool = related_pool | concat: collections['all'].products -%}
-{%- endif -%}
-{%- if collections['winter-collection'] != blank -%}
-  {%- assign related_pool = related_pool | concat: collections['winter-collection'].products -%}
-{%- endif -%}
-{%- if collections['royal-collection'] != blank -%}
-  {%- assign related_pool = related_pool | concat: collections['royal-collection'].products -%}
-{%- endif -%}
-{%- if collections['best-seller'] != blank -%}
-  {%- assign related_pool = related_pool | concat: collections['best-seller'].products -%}
-{%- endif -%}
-{%- assign fallback_handles = 'frontpage' | split: ',' -%}
-{%- for handle in fallback_handles -%}
-  {%- if collections[handle] != blank -%}
-    {%- assign related_pool = related_pool | concat: collections[handle].products -%}
-  {%- endif -%}
-{%- endfor -%}
+{%- comment -%}
+  The whole catalogue is always available (collections['all'] has 13+ products),
+  so use it as the pool. This guarantees four related cards on every product
+  page regardless of whether the product belongs to a collection.
+{%- endcomment -%}
+{%- assign related_pool = collections['all'].products -%}
 
 {%- assign related_eligible = 0 -%}
 {%- assign related_ids = ',' -%}
