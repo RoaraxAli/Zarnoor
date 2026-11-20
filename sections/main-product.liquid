@@ -11,18 +11,24 @@
 {%- for collection in product.collections -%}
   {%- assign related_pool = related_pool | concat: collection.products -%}
 {%- endfor -%}
-{%- if related_pool.size < 5 -%}
+{%- if collections['all'] != blank -%}
   {%- assign related_pool = related_pool | concat: collections['all'].products -%}
 {%- endif -%}
-{%- if related_pool.size < 5 -%}
-  {%- for handle in 'winter-collection,royal-collection,frontpage' | split: ',' -%}
-    {%- if collections[handle] != blank and collections[handle].products.size > 0 -%}
-      {%- assign related_pool = related_pool | concat: collections[handle].products -%}
-    {%- endif -%}
-  {%- endfor -%}
+{%- if collections['winter-collection'] != blank -%}
+  {%- assign related_pool = related_pool | concat: collections['winter-collection'].products -%}
 {%- endif -%}
+{%- if collections['royal-collection'] != blank -%}
+  {%- assign related_pool = related_pool | concat: collections['royal-collection'].products -%}
+{%- endif -%}
+{%- if collections['best-seller'] != blank -%}
+  {%- assign related_pool = related_pool | concat: collections['best-seller'].products -%}
+{%- endif -%}
+{%- for handle in 'frontpage' | split: ',' -%}
+  {%- if collections[handle] != blank -%}
+    {%- assign related_pool = related_pool | concat: collections[handle].products -%}
+  {%- endif -%}
+{%- endfor -%}
 
-{%- comment -%} Count products that will actually render (deduped, excluding current). {%- endcomment -%}
 {%- assign related_eligible = 0 -%}
 {%- assign related_ids = ',' -%}
 {%- for item in related_pool -%}
