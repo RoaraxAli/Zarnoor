@@ -3,19 +3,48 @@
   Shows the piece's colour as a real swatch instead of a "Colour: …" text line.
 
   Label resolution order (first non-blank wins):
-    1. a product option named Colour / Color  → the label typed on the product
-    2. product.metafields.custom.colour_name / custom.color_name
-    3. the "Color: …" line at the top of the product description
-    4. product.metafields.custom.colour / custom.color, when it is plain text
-    5. a tag written as colour:Purple or color:Purple
-    6. a colour word found in the title or tags
+    1. the Shopify category metafield Color (shopify.color-pattern metaobject)
+    2. a product option named Colour / Color
+    3. product.metafields.custom.colour_name / custom.color_name
+    4. the "Color: …" line at the top of the product description
+    5. product.metafields.custom.colour / custom.color, when it is plain text
+    6. a tag written as colour:Purple or color:Purple
+    7. a colour word found in the title or tags
 
   Hex resolution order:
-    1. product.metafields.custom.colour_hex / custom.color_hex
-    2. product.metafields.custom.colour / custom.color when it holds a colour
-    3. the built-in palette below
+    1. the category metafield Color value (e.g. #F61F1F)
+    2. product.metafields.custom.colour_hex / custom.color_hex
+    3. product.metafields.custom.colour / custom.color when it holds a colour
+    4. the built-in palette below
 {%- endcomment -%}
 {%- assign colour_label = '' -%}
+{%- assign category_hex = '' -%}
+
+{%- comment -%}
+  Shopify's category metafield Color stores a color-pattern metaobject:
+  label ("Rich Crimson Red"), color (#F61F1F), image, base colour. It may be a
+  single reference or a list, so take the first entry either way.
+{%- endcomment -%}
+{%- assign colour_patterns = product.metafields.shopify['color-pattern'].value -%}
+{%- if colour_patterns != blank -%}
+  {%- assign colour_pattern = colour_patterns.first | default: colour_patterns -%}
+  {%- assign colour_pattern_label = colour_pattern.label | default: colour_pattern.label.value -%}
+  {%- if colour_pattern_label != blank -%}
+    {%- assign colour_label = colour_pattern_label | append: '' -%}
+  {%- endif -%}
+  {%- capture pattern_raw -%}{{ colour_pattern.color }}{%- endcapture -%}
+  {%- assign pattern_raw = pattern_raw | strip -%}
+  {%- if pattern_raw == blank -%}
+    {%- capture pattern_raw -%}{{ colour_pattern.color.value }}{%- endcapture -%}
+    {%- assign pattern_raw = pattern_raw | strip -%}
+  {%- endif -%}
+  {%- assign pattern_head = pattern_raw | slice: 0, 1 -%}
+  {%- if pattern_raw contains '(' or pattern_head == '#' -%}
+    {%- assign category_hex = pattern_raw -%}
+  {%- elsif pattern_raw.size == 6 -%}
+    {%- assign category_hex = pattern_raw | prepend: '#' -%}
+  {%- endif -%}
+{%- endif -%}
 
 {%- for option in product.options_with_values -%}
   {%- assign option_name = option.name | downcase -%}
@@ -23,7 +52,7 @@
     {%- assign option_colour = option.selected_value | default: option.values.first | default: '' | strip -%}
     {%- assign option_colour_down = option_colour | downcase -%}
     {%- if option_colour_down != '' and option_colour_down != 'default title' -%}
-      {%- assign colour_label = option_colour -%}
+      {%- if colour_label == blank -%}{%- assign colour_label = option_colour -%}{%- endif -%}
       {%- break -%}
     {%- endif -%}
   {%- endif -%}
@@ -93,7 +122,10 @@
   {%- endcapture -%}
 {%- endif -%}
 
-{%- assign colour_hex = product.metafields.custom.colour_hex.value | default: product.metafields.custom.color_hex.value -%}
+{%- assign colour_hex = category_hex | default: '' -%}
+{%- if colour_hex == blank -%}
+  {%- assign colour_hex = product.metafields.custom.colour_hex.value | default: product.metafields.custom.color_hex.value | default: '' -%}
+{%- endif -%}
 
 {%- if colour_hex == blank and colour_meta_css != blank -%}
   {%- assign colour_hex = colour_meta_css -%}
@@ -133,7 +165,7 @@
   {%- endif -%}
 {%- endif -%}
 
-{%- if colour_label != blank or colour_meta_css != blank -%}
+{%- if colour_label != blank or colour_meta_css != blank or category_hex != blank -%}
   <div class="product-colour">
     <span class="product-colour-label">Color</span>
     <span class="product-colour-chip" style="background-color: {{ colour_hex }};"></span>
