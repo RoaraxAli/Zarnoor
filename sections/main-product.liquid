@@ -74,6 +74,8 @@
         <span class="product-sku">Code: {{ current_variant.sku }}</span>
       {%- endif -%}
 
+      {% render 'product-colour', product: product %}
+
       <div class="product-price-row">
         <span class="price-current" id="product-price">{{ current_variant.price | money }}</span>
         <span class="price-original" id="product-compare" {% unless current_variant.compare_at_price > current_variant.price %}style="display:none;"{% endunless %}>
@@ -157,7 +159,24 @@
           <summary>Details</summary>
           <div class="accordion-body">
             {%- if product.description != blank -%}
-              {{ product.description }}
+              {%- assign desc = product.description -%}
+              {%- if desc contains 'Colour:' or desc contains 'Color:' -%}
+                {%- comment -%}
+                  The colour is shown as a swatch above, so the "Colour: …" line
+                  that came in from the product import is dropped here.
+                {%- endcomment -%}
+                {%- assign desc_chunks = desc | split: '</p>' -%}
+                {%- for chunk in desc_chunks -%}
+                  {%- assign probe = chunk | strip_html | strip | downcase -%}
+                  {%- assign head7 = probe | slice: 0, 7 -%}
+                  {%- assign head6 = probe | slice: 0, 6 -%}
+                  {%- if head7 == 'colour:' or head6 == 'color:' -%}{%- continue -%}{%- endif -%}
+                  {%- if probe == blank -%}{%- continue -%}{%- endif -%}
+                  {{ chunk }}{%- if chunk contains '<p' -%}</p>{%- endif -%}
+                {%- endfor -%}
+              {%- else -%}
+                {{ desc }}
+              {%- endif -%}
             {%- else -%}
               <p>{{ product.title }}{% if fabric != blank %} in {{ fabric | downcase }}{% endif %}. Cut and finished in our Karachi studio.</p>
             {%- endif -%}

@@ -1,0 +1,109 @@
+{%- comment -%}
+  Product colour.
+  Shows the piece's colour as a real swatch instead of a "Colour: …" text line.
+  Label resolution order:
+    1. product.metafields.custom.colour / custom.color
+    2. a tag written as colour:Purple or color:Purple
+    3. a colour word found in the title or tags
+  Hex resolution order:
+    1. product.metafields.custom.colour_hex / custom.color_hex
+    2. the built-in palette below
+{%- endcomment -%}
+{%- assign colour_label = product.metafields.custom.colour.value | default: product.metafields.custom.color.value -%}
+
+{%- if colour_label == blank -%}
+  {%- for tag in product.tags -%}
+    {%- assign tag_down = tag | downcase | strip -%}
+    {%- if tag_down contains 'colour:' -%}
+      {%- assign colour_label = tag | split: ':' | last | strip -%}
+      {%- break -%}
+    {%- endif -%}
+    {%- if tag_down contains 'color:' -%}
+      {%- assign colour_label = tag | split: ':' | last | strip -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- capture colour_haystack -%}{{ product.title }}{%- for tag in product.tags %} {{ tag }}{%- endfor -%}{%- endcapture -%}
+{%- assign colour_haystack = colour_haystack | downcase -%}
+
+{%- if colour_label == blank -%}
+  {%- assign palette_words = 'dusty rose,deep rose,powder blue,petal pink,poison blue,cocoa brown,allure black,golden,champagne,black,purple,maroon,burgundy,red,rose,pink,peach,coco,cocoa,brown,biscotti,beige,cream,ivory,blue,matcha,green,olive,mint,teal,navy,lilac,mustard,silver,grey,gray,white' | split: ',' -%}
+  {%- for word in palette_words -%}
+    {%- if colour_haystack contains word -%}
+      {%- assign colour_label = word | capitalize -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- if colour_label != blank -%}
+  {%- assign label_words = colour_label | split: ' ' -%}
+  {%- capture colour_label -%}
+    {%- for word in label_words -%}{{ word | capitalize }}{%- unless forloop.last %} {% endunless -%}{%- endfor -%}
+  {%- endcapture -%}
+{%- endif -%}
+
+{%- assign colour_hex = product.metafields.custom.colour_hex.value | default: product.metafields.custom.color_hex.value -%}
+
+{%- if colour_hex == blank -%}
+  {%- assign colour_key = colour_haystack | append: ' ' | append: colour_label | downcase -%}
+  {%- assign colour_hex = '#cfc6bb' -%}
+  {%- if colour_key contains 'allure' or colour_key contains 'black' -%}{%- assign colour_hex = '#121212' -%}
+  {%- elsif colour_key contains 'aks' or colour_key contains 'purple' -%}{%- assign colour_hex = '#6c3f8f' -%}
+  {%- elsif colour_key contains 'imaan' or colour_key contains 'red' -%}{%- assign colour_hex = '#a51f2b' -%}
+  {%- elsif colour_key contains 'mehfil' or colour_key contains 'gold' or colour_key contains 'champagne' -%}{%- assign colour_hex = '#b78a3c' -%}
+  {%- elsif colour_key contains 'pastelle' or colour_key contains 'peach' -%}{%- assign colour_hex = '#efb39a' -%}
+  {%- elsif colour_key contains 'coco' or colour_key contains 'cocoa' or colour_key contains 'brown' -%}{%- assign colour_hex = '#5f4032' -%}
+  {%- elsif colour_key contains 'biscotti' or colour_key contains 'beige' or colour_key contains 'camel' -%}{%- assign colour_hex = '#cdb08a' -%}
+  {%- elsif colour_key contains 'deep rose' or colour_key contains 'maroon' or colour_key contains 'burgundy' -%}{%- assign colour_hex = '#9d2438' -%}
+  {%- elsif colour_key contains 'dusty rose' or colour_key contains 'rose' -%}{%- assign colour_hex = '#c08b8f' -%}
+  {%- elsif colour_key contains 'petal' or colour_key contains 'pink' -%}{%- assign colour_hex = '#f0bfc9' -%}
+  {%- elsif colour_key contains 'poison' or colour_key contains 'navy' -%}{%- assign colour_hex = '#1e2f52' -%}
+  {%- elsif colour_key contains 'powder' or colour_key contains 'sky' -%}{%- assign colour_hex = '#a8c6dd' -%}
+  {%- elsif colour_key contains 'matcha' or colour_key contains 'olive' -%}{%- assign colour_hex = '#7d8f5a' -%}
+  {%- elsif colour_key contains 'mint' or colour_key contains 'green' -%}{%- assign colour_hex = '#7fa88a' -%}
+  {%- elsif colour_key contains 'teal' -%}{%- assign colour_hex = '#2f6f73' -%}
+  {%- elsif colour_key contains 'lilac' -%}{%- assign colour_hex = '#b3a0cf' -%}
+  {%- elsif colour_key contains 'mustard' -%}{%- assign colour_hex = '#c2982f' -%}
+  {%- elsif colour_key contains 'silver' or colour_key contains 'grey' or colour_key contains 'gray' -%}{%- assign colour_hex = '#b8b8b8' -%}
+  {%- elsif colour_key contains 'ivory' or colour_key contains 'cream' or colour_key contains 'white' -%}{%- assign colour_hex = '#f2ece1' -%}
+  {%- elsif colour_key contains 'blue' -%}{%- assign colour_hex = '#3d5f8a' -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- if colour_label != blank -%}
+  <div class="product-colour">
+    <span class="product-colour-label">Colour</span>
+    <span class="product-colour-chip" style="background-color: {{ colour_hex }};"></span>
+    <span class="product-colour-name">{{ colour_label }}</span>
+  </div>
+
+  <style>
+    .product-colour {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0 2px;
+      font-size: 11px;
+      letter-spacing: .04em;
+      color: var(--ink, #302724);
+    }
+    .product-colour-label {
+      font-size: 9px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--muted, #8a7d74);
+    }
+    .product-colour-chip {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, .16);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .45);
+      flex: 0 0 auto;
+    }
+    .product-colour-name { color: var(--ink, #302724); }
+  </style>
+{%- endif -%}
