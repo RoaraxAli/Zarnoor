@@ -28,14 +28,16 @@
 {%- assign colour_patterns = product.metafields.shopify['color-pattern'].value -%}
 {%- if colour_patterns != blank -%}
   {%- assign colour_pattern = colour_patterns.first | default: colour_patterns -%}
-  {%- assign colour_pattern_label = colour_pattern.label | default: colour_pattern.label.value -%}
+  {%- comment -%} Metaobject fields are metafield drops, so read .value first. {%- endcomment -%}
+  {%- assign colour_pattern_label = colour_pattern.label.value | default: colour_pattern.label -%}
+  {%- assign colour_pattern_label = colour_pattern_label | append: '' | strip -%}
   {%- if colour_pattern_label != blank -%}
-    {%- assign colour_label = colour_pattern_label | append: '' -%}
+    {%- assign colour_label = colour_pattern_label -%}
   {%- endif -%}
-  {%- capture pattern_raw -%}{{ colour_pattern.color }}{%- endcapture -%}
+  {%- capture pattern_raw -%}{{ colour_pattern.color.value }}{%- endcapture -%}
   {%- assign pattern_raw = pattern_raw | strip -%}
   {%- if pattern_raw == blank -%}
-    {%- capture pattern_raw -%}{{ colour_pattern.color.value }}{%- endcapture -%}
+    {%- capture pattern_raw -%}{{ colour_pattern.color }}{%- endcapture -%}
     {%- assign pattern_raw = pattern_raw | strip -%}
   {%- endif -%}
   {%- assign pattern_head = pattern_raw | slice: 0, 1 -%}
