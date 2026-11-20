@@ -457,9 +457,9 @@ input, select, textarea, button { border-radius: 8px; }
 .hero-carousel-arrow { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ink); font-size: 18px; cursor: pointer; }
 .hero-carousel-arrow:hover { background: rgba(80, 20, 35, .1); }
 .hero-carousel-arrow:focus-visible, .hero-carousel-dot:focus-visible { outline: 2px solid #7d2439; outline-offset: 3px; }
-.hero-carousel-dots { display: flex; align-items: center; gap: 8px; }
-.hero-carousel-dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: rgba(45, 31, 31, .35); cursor: pointer; transition: width .2s ease, background .2s ease; }
-.hero-carousel-dot.is-active { width: 22px; border-radius: 999px; background: #7d2439; }
+.hero-carousel-dots { display: flex; align-items: center; gap: 12px; }
+.hero-carousel-dot { width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: rgba(45, 31, 31, .35); cursor: pointer; transition: width .2s ease, background .2s ease; }
+.hero-carousel-dot.is-active { width: 72px; border-radius: 999px; background: #7d2439; }
 
 @media (max-width: 749px) {
   .hero-section:not(.hero-carousel) { height: 78svh; min-height: 480px; max-height: 720px; }
