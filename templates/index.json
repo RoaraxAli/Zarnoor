@@ -12,6 +12,15 @@
     "hero_banner": {
       "type": "hero-banner",
       "blocks": {
+        "slide_W98dqT": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-11-24_at_00.01.12_1.jpg",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-11-24_at_00.01.12_1.jpg",
+            "alt": "Zarnoor campaign",
+            "link": ""
+          }
+        },
         "slide_9ghhfh": {
           "type": "slide",
           "settings": {
@@ -21,11 +30,11 @@
             "link": ""
           }
         },
-        "slide_W98dqT": {
+        "slide_gpzw9W": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-11-24_at_00.01.12_1.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-11-24_at_00.01.12_1.jpg",
+            "image": "shopify://shop_images/banner-pink.jpg",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-11-23_at_23.25.47.jpg",
             "alt": "Zarnoor campaign",
             "link": ""
           }
@@ -50,8 +59,9 @@
         }
       },
       "block_order": [
-        "slide_9ghhfh",
         "slide_W98dqT",
+        "slide_9ghhfh",
+        "slide_gpzw9W",
         "slide_AMMF4G",
         "slide_aHejUb"
       ],
