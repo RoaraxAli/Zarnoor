@@ -21,15 +21,6 @@
             "link": ""
           }
         },
-        "slide_9ghhfh": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-11-24_at_00.02.25_1.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-11-24_at_00.02.25.jpg",
-            "alt": "Zarnoor campaign",
-            "link": ""
-          }
-        },
         "slide_gpzw9W": {
           "type": "slide",
           "settings": {
@@ -60,7 +51,6 @@
       },
       "block_order": [
         "slide_W98dqT",
-        "slide_9ghhfh",
         "slide_gpzw9W",
         "slide_AMMF4G",
         "slide_aHejUb"
