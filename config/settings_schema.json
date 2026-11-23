@@ -26,7 +26,7 @@
   {
     "name": "Shop",
     "settings": [
-      { "type": "text", "id": "announcement_text", "label": "Announcement bar", "default": "Free nationwide delivery · Cash on delivery available" },
+      { "type": "text", "id": "announcement_text", "label": "Announcement bar", "default": "Free nationwide delivery in 2–3 weeks · Cash on delivery available" },
       { "type": "number", "id": "free_shipping_threshold", "label": "Free delivery threshold (PKR)", "default": 0, "info": "0 means free delivery on every order." },
       { "type": "url", "id": "order_tracking_url", "label": "Order tracking link" }
     ]

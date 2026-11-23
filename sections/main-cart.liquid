@@ -61,12 +61,13 @@
         <h2>Order summary</h2>
         <div class="summary-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
         <div class="summary-row"><span>Delivery</span><span>Free</span></div>
+        <div class="summary-row"><span>Delivery time</span><span>2–3 weeks</span></div>
         <div class="summary-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
 
         <button type="submit" name="checkout" class="btn btn-primary btn--block">Proceed to checkout</button>
         <button type="submit" name="update" class="cart-update">Update bag</button>
 
-        <p class="cart-note">Cash on delivery available. Dispatched in 2–4 working days. 7-day exchange on unworn pieces.</p>
+        <p class="cart-note">Cash on delivery available. Delivered in 2–3 weeks. 7-day exchange on unworn pieces.</p>
       </aside>
     </form>
   {%- endif -%}
