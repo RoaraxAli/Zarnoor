@@ -232,11 +232,8 @@
         <details class="accordion" id="size-guide">
           <summary>Size guide</summary>
           <div class="accordion-body">
-            {%- if section.settings.size_guide != blank -%}
-              {{ section.settings.size_guide }}
-            {%- else -%}
-              {% render 'size-chart' %}
-            {%- endif -%}
+            {%- comment -%} Per-product chart (custom.size_chart) wins over the section text and the default chart. {%- endcomment -%}
+            {% render 'size-chart', product: product, fallback_html: section.settings.size_guide %}
           </div>
         </details>
       </div>
