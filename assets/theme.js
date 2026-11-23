@@ -817,6 +817,73 @@
       if (plus) plus.disabled = stockCap !== null && v >= stockCap;
     };
 
+    function optionStockFor(btn) {
+      const position = Number(btn.dataset.optionPosition) - 1;
+      const base = selected.options ? selected.options.slice() : [selected.option1, selected.option2, selected.option3];
+      const target = base.slice();
+      target[position] = btn.dataset.optionValue;
+
+      let qty = 0;
+      let tracked = false;
+      let available = false;
+      variants.forEach((v) => {
+        const opts = v.options || [v.option1, v.option2, v.option3];
+        for (let i = 0; i < target.length; i += 1) {
+          if (target[i] && opts[i] !== target[i]) return;
+        }
+        const info = inventoryMap[String(v.id)];
+        if (info && info.tracked && info.policy !== 'continue') {
+          tracked = true;
+          qty += Number(info.qty) || 0;
+        }
+        if (v.available) available = true;
+      });
+
+      return { qty, tracked, available };
+    }
+
+    function syncOptionStock() {
+      const buttons = document.querySelectorAll('.option-value.has-stock');
+      if (!buttons.length) return;
+
+      buttons.forEach((btn) => {
+        const state = optionStockFor(btn);
+        const label = btn.querySelector('.option-stock');
+        const position = Number(btn.dataset.optionPosition) - 1;
+        const isSelected = selected.options
+          ? selected.options[position] === btn.dataset.optionValue
+          : selected['option' + (position + 1)] === btn.dataset.optionValue;
+
+        btn.dataset.stock = String(state.qty);
+        btn.dataset.tracked = state.tracked ? 'true' : 'false';
+
+        const soldOut = state.tracked ? state.qty <= 0 : !state.available;
+        btn.classList.toggle('is-soldout', soldOut);
+        btn.disabled = soldOut && !isSelected;
+
+        if (label) {
+          if (state.tracked) {
+            label.textContent = state.qty <= 0 ? 'Sold out' : (state.qty <= 10 ? state.qty + ' left' : 'In stock');
+            label.classList.toggle('is-low', state.qty > 0 && state.qty <= 10);
+          } else {
+            label.textContent = state.available ? 'In stock' : 'Sold out';
+            label.classList.remove('is-low');
+          }
+        }
+      });
+
+      const line = document.getElementById('option-stock-line');
+      if (line) {
+        if (stockCap !== null && stockCap > 0 && stockCap <= 10) {
+          line.textContent = 'Only ' + stockCap + ' left in this size';
+          line.classList.add('is-visible');
+        } else {
+          line.textContent = '';
+          line.classList.remove('is-visible');
+        }
+      }
+    }
+
     const update = (variant) => {
       if (!variant) return;
       selected = variant;
@@ -859,6 +926,8 @@
         const value = variant.options ? variant.options[position] : variant['option' + (position + 1)];
         btn.classList.toggle('is-selected', value === btn.dataset.optionValue);
       });
+
+      syncOptionStock();
     };
 
     document.querySelectorAll('.option-value').forEach((btn) => {

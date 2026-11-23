@@ -108,25 +108,65 @@
         <input type="hidden" name="id" id="selected-variant-id" value="{{ current_variant.id }}">
 
         {%- for option in product.options_with_values -%}
+          {%- assign option_pos = option.position -%}
+          {%- assign option_name_down = option.name | downcase -%}
+          {%- assign show_stock = false -%}
+          {%- if option_name_down contains 'size' -%}{%- assign show_stock = true -%}{%- endif -%}
           <div class="option-group" data-option-index="{{ forloop.index0 }}">
             <span class="option-label">
               <span>{{ option.name }}</span>
-              {%- if option.name == 'Size' -%}
+              {%- if show_stock -%}
                 <a href="#size-guide" class="size-guide-btn" data-open-size-guide>Size guide</a>
               {%- endif -%}
             </span>
             <div class="option-values">
               {%- for value in option.values -%}
+                {%- assign stock_qty = 0 -%}
+                {%- assign stock_tracked = false -%}
+                {%- assign stock_available = false -%}
+                {%- if show_stock -%}
+                  {%- for v in product.variants -%}
+                    {%- assign matches = true -%}
+                    {%- if option_pos != 1 and v.option1 != current_variant.option1 -%}{%- assign matches = false -%}{%- endif -%}
+                    {%- if option_pos != 2 and v.option2 != current_variant.option2 -%}{%- assign matches = false -%}{%- endif -%}
+                    {%- if option_pos != 3 and v.option3 != current_variant.option3 -%}{%- assign matches = false -%}{%- endif -%}
+                    {%- if option_pos == 1 -%}{%- assign v_val = v.option1 -%}{%- elsif option_pos == 2 -%}{%- assign v_val = v.option2 -%}{%- else -%}{%- assign v_val = v.option3 -%}{%- endif -%}
+                    {%- if v_val != value -%}{%- assign matches = false -%}{%- endif -%}
+                    {%- if matches -%}
+                      {%- if v.inventory_management != blank and v.inventory_policy != 'continue' -%}
+                        {%- assign stock_tracked = true -%}
+                        {%- assign stock_qty = stock_qty | plus: v.inventory_quantity -%}
+                      {%- endif -%}
+                      {%- if v.available -%}{%- assign stock_available = true -%}{%- endif -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
                 <button
                   type="button"
-                  class="option-value{% if option.selected_value == value %} is-selected{% endif %}"
+                  class="option-value{% if show_stock %} has-stock{% endif %}{% if option.selected_value == value %} is-selected{% endif %}{% if show_stock and stock_tracked and stock_qty <= 0 %} is-soldout{% endif %}"
                   data-option-value="{{ value | escape }}"
                   data-option-position="{{ option.position }}"
+                  {%- if show_stock %} data-tracked="{{ stock_tracked }}" data-stock="{{ stock_qty }}"{% endif %}
+                  {%- if show_stock and stock_tracked and stock_qty <= 0 %} disabled{% endif %}
                 >
-                  {{ value }}
+                  <span class="option-value-text">{{ value }}</span>
+                  {%- if show_stock -%}
+                    <span class="option-stock{% if stock_tracked and stock_qty > 0 and stock_qty <= 10 %} is-low{% endif %}">
+                      {%- if stock_tracked -%}
+                        {%- if stock_qty <= 0 -%}Sold out{%- elsif stock_qty <= 10 -%}{{ stock_qty }} left{%- else -%}In stock{%- endif -%}
+                      {%- elsif stock_available -%}
+                        In stock
+                      {%- else -%}
+                        Sold out
+                      {%- endif -%}
+                    </span>
+                  {%- endif -%}
                 </button>
               {%- endfor -%}
             </div>
+            {%- if show_stock -%}
+              <p class="option-stock-line" id="option-stock-line" aria-live="polite"></p>
+            {%- endif -%}
           </div>
         {%- endfor -%}
 
@@ -136,7 +176,11 @@
             <input type="number" name="quantity" id="product-qty" value="1" min="1" {% if current_variant.inventory_management != blank and current_variant.inventory_policy != 'continue' and current_variant.inventory_quantity >= 0 %}max="{{ current_variant.inventory_quantity }}"{% endif %} inputmode="numeric" aria-label="Quantity">
             <button type="button" data-qty-plus aria-label="Increase quantity">+</button>
           </div>
-          <span class="stock-note" id="stock-note">{% if current_variant.available %}{% if current_variant.inventory_management != blank and current_variant.inventory_policy != 'continue' and current_variant.inventory_quantity >= 0 %}In stock ({{ current_variant.inventory_quantity }}){% else %}In stock{% endif %}{% else %}Sold out{% endif %}</span>
+          {%- unless product.has_only_default_variant -%}
+            <span class="stock-note" id="stock-note" hidden>{% if current_variant.available %}In stock{% else %}Sold out{% endif %}</span>
+          {%- else -%}
+            <span class="stock-note" id="stock-note">{% if current_variant.available %}{% if current_variant.inventory_management != blank and current_variant.inventory_policy != 'continue' and current_variant.inventory_quantity >= 0 %}In stock ({{ current_variant.inventory_quantity }}){% else %}In stock{% endif %}{% else %}Sold out{% endif %}</span>
+          {%- endunless -%}
         </div>
 
         <div class="product-cta">
