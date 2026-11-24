@@ -702,7 +702,7 @@
     }
     const lines = items.map((item) => '• ' + item.quantity + 'x ' + item.product_title + ' (' + money(item.final_line_price) + ')').join('\n');
     const message = 'Hello Zarnoor, I would like to order:\n\n' + lines + '\n\nTotal: ' + money(cartState.total_price) + '\nPayment: Cash on delivery';
-    window.open('https://wa.me/' + (settings.whatsapp || '923303084777') + '?text=' + encodeURIComponent(message), '_blank');
+    window.open('https://wa.me/' + (settings.whatsapp || '') + '?text=' + encodeURIComponent(message), '_blank');
   }
 
   /* ---------------- Product page ---------------- */

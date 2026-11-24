@@ -1,3 +1,4 @@
+{%- capture wa_number -%}{%- render 'whatsapp-number', wa_override: settings.whatsapp_number, wa_store: shop.phone -%}{%- endcapture -%}
 {%- if page.handle == 'size-guide' or page.handle == 'size-chart' -%}
   <section class="page-shell size-chart-page">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -42,7 +43,7 @@
         </div>
         <div class="contact-page__detail">
           <span class="contact-page__label">WhatsApp</span>
-          <a href="https://wa.me/{{ settings.whatsapp_number | default: '923303084777' }}" target="_blank" rel="noopener">Chat with the studio <span aria-hidden="true">↗</span></a>
+          <a href="https://wa.me/{{ wa_number }}" target="_blank" rel="noopener">Chat with the studio <span aria-hidden="true">↗</span></a>
         </div>
         <p class="contact-page__note">For order questions, adding your order number helps us find things faster.</p>
       </div>

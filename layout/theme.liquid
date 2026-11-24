@@ -1,3 +1,4 @@
+{%- capture wa_number -%}{%- render 'whatsapp-number', wa_override: settings.whatsapp_number, wa_store: shop.phone -%}{%- endcapture -%}
 <!doctype html>
 <html class="no-js" lang="{{ request.locale.iso_code }}">
   <head>
@@ -106,7 +107,7 @@
       window.zarnoorSettings = {
         moneyFormat: {{ shop.money_format | json }},
         freeShipping: {{ settings.free_shipping_threshold | default: 0 | json }},
-        whatsapp: {{ settings.whatsapp_number | default: '923303084777' | json }},
+        whatsapp: {{ wa_number | json }},
         cartUrl: {{ routes.cart_url | json }},
         searchUrl: {{ routes.search_url | json }}
       };

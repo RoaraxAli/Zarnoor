@@ -1,3 +1,5 @@
+{%- capture wa_number -%}{%- render 'whatsapp-number', wa_override: settings.whatsapp_number, wa_store: shop.phone -%}{%- endcapture -%}
+{%- assign wa_display = shop.phone | default: '+' | append: wa_number -%}
 <footer class="site-footer">
   <div class="footer-container">
     <div class="footer-grid">
@@ -34,11 +36,11 @@
             {%- if section.settings.contact_label != blank -%}
               <span class="contact-label">{{ section.settings.contact_label }}</span>
             {%- endif -%}
-            <a class="contact-val" href="https://wa.me/{{ settings.whatsapp_number | default: '923303084777' }}" target="_blank" rel="noopener">
+            <a class="contact-val" href="https://wa.me/{{ wa_number }}" target="_blank" rel="noopener">
               {%- if section.settings.contact_value != blank -%}
                 {{ section.settings.contact_value }}
               {%- else -%}
-                WhatsApp +{{ settings.whatsapp_number | default: '92 330 3084777' }}
+                WhatsApp {{ wa_display }}
               {%- endif -%}
             </a>
             {%- if settings.contact_email != blank -%}
@@ -125,7 +127,7 @@
                   {% if settings.instagram_url != blank %}<a href="{{ settings.instagram_url }}" class="social-icon" target="_blank" rel="noopener">Instagram</a>{% endif %}
                   {% if settings.facebook_url != blank %}<a href="{{ settings.facebook_url }}" class="social-icon" target="_blank" rel="noopener">Facebook</a>{% endif %}
                   {% if settings.tiktok_url != blank %}<a href="{{ settings.tiktok_url }}" class="social-icon" target="_blank" rel="noopener">TikTok</a>{% endif %}
-                  <a href="https://wa.me/{{ settings.whatsapp_number | default: '923303084777' }}" class="social-icon" target="_blank" rel="noopener">WhatsApp</a>
+                  <a href="https://wa.me/{{ wa_number }}" class="social-icon" target="_blank" rel="noopener">WhatsApp</a>
                 </div>
               {%- endif -%}
             </div>

@@ -12,7 +12,7 @@
     "settings": [
       { "type": "image_picker", "id": "logo", "label": "Logo" },
       { "type": "range", "id": "logo_width", "min": 60, "max": 220, "step": 2, "unit": "px", "default": 116, "label": "Logo width" },
-      { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "923303084777", "info": "Digits only, including country code." },
+      { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number override", "default": "", "info": "Leave blank to use Settings → Store details → Phone. Fill only if WhatsApp differs from the store phone. Digits only, country code included." },
       { "type": "text", "id": "contact_email", "label": "Contact email", "default": "zarnoorbyukasha@gmail.com" },
       { "type": "url", "id": "instagram_url", "label": "Instagram" },
       { "type": "url", "id": "facebook_url", "label": "Facebook" },

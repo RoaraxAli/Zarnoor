@@ -104,6 +104,7 @@
         </span>
       </div>
 
+      {%- capture wa_number -%}{%- render 'whatsapp-number', wa_override: settings.whatsapp_number, wa_store: shop.phone -%}{%- endcapture -%}
       {% form 'product', product, id: 'product-form', class: 'product-form' %}
         <input type="hidden" name="id" id="selected-variant-id" value="{{ current_variant.id }}">
 
@@ -189,7 +190,7 @@
           </button>
           <a
             class="btn btn--outline btn--block"
-            href="https://wa.me/{{ settings.whatsapp_number | default: '923303084777' }}?text={{ wa_text | url_encode }}"
+            href="https://wa.me/{{ wa_number }}?text={{ wa_text | url_encode }}"
             target="_blank"
             rel="noopener"
           >

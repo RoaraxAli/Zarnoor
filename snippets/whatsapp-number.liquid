@@ -1,0 +1,33 @@
+{%- comment -%}
+  Zarnoor WhatsApp number — one source for every wa.me link.
+
+  Priority:
+    1. Theme settings → Shop → WhatsApp number (an override, normally blank)
+    2. Shopify Settings → Store details → Phone (shop.phone)
+    3. Built-in fallback
+
+  Outputs digits only, country code included, ready for https://wa.me/<digits>.
+
+  Usage (pass both so the snippet works inside {% render %}'s isolated scope):
+    {%- capture wa_number -%}{%- render 'whatsapp-number', wa_override: settings.whatsapp_number, wa_store: shop.phone -%}{%- endcapture -%}
+    <a href="https://wa.me/{{ wa_number }}">…</a>
+{%- endcomment -%}
+{%- liquid
+  assign wa_raw = wa_override
+  if wa_raw == blank
+    assign wa_raw = wa_store
+  endif
+
+  assign wa_digits = wa_raw | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '.' | remove: '/' | remove: '+'
+  assign wa_digits = wa_digits | strip
+
+  if wa_digits == blank
+    assign wa_digits = '923303084777'
+  endif
+
+  assign wa_prefix = wa_digits | slice: 0, 2
+  if wa_prefix == '00'
+    assign wa_digits = wa_digits | slice: 2, 30
+  endif
+-%}
+{{- wa_digits -}}
