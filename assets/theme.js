@@ -26,79 +26,12 @@
     syncCart();
   });
 
+  // The hero section ships its own controller (sections/hero-banner.liquid).
+  // Nothing is started here so the two implementations can never double-advance.
   function initHeroCarousel() {
-    const carousel = document.querySelector('[data-hero-carousel]');
-    if (!carousel) return;
-    // The hero section ships its own controller; reuse it instead of starting
-    // a second timer that would double-advance the slides.
-    if (carousel.__zarnoorHero) {
-      carousel.__zarnoorHero.restart();
-      return;
-    }
-    if (carousel.dataset.heroInitialized === '1') return;
-    carousel.dataset.heroInitialized = '1';
-
-    const slides = Array.from(carousel.querySelectorAll('[data-hero-slide]'));
-    const dots = Array.from(carousel.querySelectorAll('[data-hero-dot]'));
-    if (slides.length < 2) return;
-
-    let activeIndex = 0;
-    let timer = null;
-
-    slides.forEach((slide, i) => {
-      if (slide.classList.contains('is-active')) activeIndex = i;
+    document.querySelectorAll('[data-hero-carousel]').forEach(function (carousel) {
+      if (carousel.__zarnoorHero) carousel.__zarnoorHero.restart();
     });
-
-    function showSlide(index) {
-      activeIndex = ((index % slides.length) + slides.length) % slides.length;
-      slides.forEach((slide, i) => {
-        const active = i === activeIndex;
-        slide.classList.toggle('is-active', active);
-        slide.setAttribute('aria-hidden', active ? 'false' : 'true');
-      });
-      dots.forEach((dot, i) => {
-        const active = i === activeIndex;
-        dot.classList.toggle('is-active', active);
-        if (active) dot.setAttribute('aria-current', 'true');
-        else dot.removeAttribute('aria-current');
-      });
-    }
-
-    function stop() {
-      if (timer !== null) {
-        window.clearTimeout(timer);
-        timer = null;
-      }
-    }
-
-    function tick() {
-      timer = null;
-      if (document.hidden) return;
-      showSlide(activeIndex + 1);
-      start();
-    }
-
-    function start() {
-      stop();
-      if (document.hidden) return;
-      timer = window.setTimeout(tick, 3000);
-    }
-
-    dots.forEach((dot) => {
-      dot.addEventListener('click', () => {
-        showSlide(Number(dot.getAttribute('data-hero-dot')) || 0);
-        start();
-      });
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stop();
-      else start();
-    });
-    window.addEventListener('pageshow', start);
-
-    carousel.__zarnoorHero = { restart: start, stop, show: showSlide };
-    start();
   }
 
   /* ---------------- Drawers ---------------- */

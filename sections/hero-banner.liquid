@@ -1,29 +1,62 @@
-<section class="hero-section hero-carousel" aria-label="Featured campaigns" data-hero-carousel aria-roledescription="carousel">
+{%- assign hero_first_desktop_index = -1 -%}
+{%- assign hero_first_mobile_index = -1 -%}
+{%- assign hero_usable_count = 0 -%}
+{%- for block in section.blocks -%}
+  {%- assign pre_has_desktop = false -%}
+  {%- assign pre_has_mobile = false -%}
+  {%- if block.settings.image != blank -%}{%- assign pre_has_desktop = true -%}{%- endif -%}
+  {%- if block.settings.mobile_image != blank -%}{%- assign pre_has_mobile = true -%}{%- endif -%}
+  {%- if pre_has_desktop or pre_has_mobile -%}
+    {%- if pre_has_desktop and hero_first_desktop_index == -1 -%}{%- assign hero_first_desktop_index = hero_usable_count -%}{%- endif -%}
+    {%- if pre_has_mobile and hero_first_mobile_index == -1 -%}{%- assign hero_first_mobile_index = hero_usable_count -%}{%- endif -%}
+    {%- assign hero_usable_count = hero_usable_count | plus: 1 -%}
+  {%- endif -%}
+{%- endfor -%}
+
+<section class="hero-section hero-carousel{% if hero_first_desktop_index == -1 %} hero-carousel--no-desktop{% endif %}{% if hero_first_mobile_index == -1 %} hero-carousel--no-mobile{% endif %}" aria-label="Featured campaigns" data-hero-carousel aria-roledescription="carousel">
   <div class="hero-carousel-slides">
     {%- assign hero_slide_index = 0 -%}
     {%- if section.blocks.size > 0 -%}
       {%- for block in section.blocks -%}
-        {%- if block.settings.image != blank -%}
-          <div class="hero-carousel-slide{% if hero_slide_index == 0 %} is-active{% endif %}" data-hero-slide{% if hero_slide_index > 0 %} aria-hidden="true"{% endif %} {{ block.shopify_attributes }}>
+        {%- assign hero_has_desktop = false -%}
+        {%- assign hero_has_mobile = false -%}
+        {%- if block.settings.image != blank -%}{%- assign hero_has_desktop = true -%}{%- endif -%}
+        {%- if block.settings.mobile_image != blank -%}{%- assign hero_has_mobile = true -%}{%- endif -%}
+        {%- if hero_has_desktop or hero_has_mobile -%}
+          {%- assign hero_fallback_image = block.settings.image | default: block.settings.mobile_image -%}
+          <div class="hero-carousel-slide{% if hero_slide_index == hero_first_desktop_index %} is-active-desktop{% endif %}{% if hero_slide_index == hero_first_mobile_index %} is-active-mobile{% endif %}" data-hero-slide data-hero-desktop="{{ hero_has_desktop }}" data-hero-mobile="{{ hero_has_mobile }}" aria-hidden="true" {{ block.shopify_attributes }}>
             {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" class="hero-carousel-link">{%- endif -%}
-            <picture class="hero-carousel-media{% if block.settings.mobile_image != blank %} has-mobile-image{% endif %}">
-              {%- if block.settings.mobile_image != blank -%}
+            <picture class="hero-carousel-media{% if hero_has_mobile %} has-mobile-image{% endif %}">
+              {%- if hero_has_mobile -%}
                 <source
                   media="(max-width: 749px)"
                   srcset="{{ block.settings.mobile_image | image_url: width: 480 }} 480w, {{ block.settings.mobile_image | image_url: width: 750 }} 750w, {{ block.settings.mobile_image | image_url: width: 1100 }} 1100w"
                   sizes="100vw"
                 >
               {%- endif -%}
-              <img
-                class="hero-carousel-image"
-                src="{{ block.settings.image | image_url: width: 2400 }}"
-                srcset="{{ block.settings.image | image_url: width: 800 }} 800w, {{ block.settings.image | image_url: width: 1200 }} 1200w, {{ block.settings.image | image_url: width: 1974 }} 1974w"
-                sizes="100vw"
-                alt="{{ block.settings.alt | escape }}"
-                width="{{ block.settings.image.width }}"
-                height="{{ block.settings.image.height }}"
-                {% if hero_slide_index == 0 %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
-              >
+              {%- if hero_has_desktop -%}
+                <img
+                  class="hero-carousel-image"
+                  src="{{ hero_fallback_image | image_url: width: 2400 }}"
+                  srcset="{{ hero_fallback_image | image_url: width: 800 }} 800w, {{ hero_fallback_image | image_url: width: 1200 }} 1200w, {{ hero_fallback_image | image_url: width: 1974 }} 1974w"
+                  sizes="100vw"
+                  alt="{{ block.settings.alt | escape }}"
+                  width="{{ hero_fallback_image.width }}"
+                  height="{{ hero_fallback_image.height }}"
+                  {% if hero_slide_index == 0 or hero_slide_index == hero_first_desktop_index %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                >
+              {%- else -%}
+                <img
+                  class="hero-carousel-image"
+                  src="{{ hero_fallback_image | image_url: width: 1100 }}"
+                  srcset="{{ hero_fallback_image | image_url: width: 480 }} 480w, {{ hero_fallback_image | image_url: width: 750 }} 750w, {{ hero_fallback_image | image_url: width: 1100 }} 1100w"
+                  sizes="100vw"
+                  alt="{{ block.settings.alt | escape }}"
+                  width="{{ hero_fallback_image.width }}"
+                  height="{{ hero_fallback_image.height }}"
+                  {% if hero_slide_index == hero_first_mobile_index %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                >
+              {%- endif -%}
             </picture>
             {%- if block.settings.link != blank -%}</a>{%- endif -%}
           </div>
@@ -33,18 +66,20 @@
     {%- endif -%}
   </div>
 
-  {%- if section.blocks.size > 1 -%}
+  {%- if hero_usable_count > 1 -%}
   <div class="hero-carousel-controls" aria-label="Carousel controls">
     <div class="hero-carousel-dots" role="group" aria-label="Choose a banner">
-      {%- if section.blocks.size > 0 -%}
-        {%- assign hero_dot_index = 0 -%}
-        {%- for block in section.blocks -%}
-          {%- if block.settings.image != blank -%}
-            <button class="hero-carousel-dot{% if hero_dot_index == 0 %} is-active{% endif %}" type="button" data-hero-dot="{{ hero_dot_index }}" aria-label="Show banner {{ hero_dot_index | plus: 1 }}"{% if hero_dot_index == 0 %} aria-current="true"{% endif %}></button>
-            {%- assign hero_dot_index = hero_dot_index | plus: 1 -%}
-          {%- endif -%}
-        {%- endfor -%}
-      {%- endif -%}
+      {%- assign hero_dot_index = 0 -%}
+      {%- for block in section.blocks -%}
+        {%- if block.settings.image != blank or block.settings.mobile_image != blank -%}
+          {%- assign dot_has_desktop = false -%}
+          {%- assign dot_has_mobile = false -%}
+          {%- if block.settings.image != blank -%}{%- assign dot_has_desktop = true -%}{%- endif -%}
+          {%- if block.settings.mobile_image != blank -%}{%- assign dot_has_mobile = true -%}{%- endif -%}
+          <button class="hero-carousel-dot{% if hero_dot_index == 0 %} is-active{% endif %}" type="button" data-hero-dot="{{ hero_dot_index }}" data-hero-desktop="{{ dot_has_desktop }}" data-hero-mobile="{{ dot_has_mobile }}" aria-label="Show banner {{ hero_dot_index | plus: 1 }}"{% if hero_dot_index == 0 %} aria-current="true"{% endif %}></button>
+          {%- assign hero_dot_index = hero_dot_index | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
     </div>
   </div>
   {%- endif -%}
@@ -55,10 +90,7 @@
   'use strict';
   var INTERVAL = 3000;
 
-  function init() {
-    var carousel = document.querySelector('[data-hero-carousel]');
-    if (!carousel) return;
-
+  function initCarousel(carousel) {
     // A single controller per element. Theme editor re-renders and bfcache
     // restores reuse the same node, so never start a second timer.
     if (carousel.__zarnoorHero) {
@@ -68,28 +100,61 @@
 
     var slides = Array.prototype.slice.call(carousel.querySelectorAll('[data-hero-slide]'));
     var dots = Array.prototype.slice.call(carousel.querySelectorAll('[data-hero-dot]'));
-    if (slides.length < 2) return;
+    var controls = carousel.querySelector('.hero-carousel-controls');
+    if (slides.length < 1) return;
 
     var activeIndex = 0;
     var timer = null;
+    var desktopQuery = window.matchMedia('(min-width: 750px)');
 
-    slides.forEach(function (slide, i) {
-      if (slide.classList.contains('is-active')) activeIndex = i;
-    });
+    function isSlideVisible(slide) {
+      return desktopQuery.matches
+        ? slide.getAttribute('data-hero-desktop') === 'true'
+        : slide.getAttribute('data-hero-mobile') === 'true';
+    }
+
+    function visibleIndices() {
+      var indices = [];
+      slides.forEach(function (slide, i) {
+        if (isSlideVisible(slide)) indices.push(i);
+      });
+      return indices;
+    }
+
+    function syncDots(available) {
+      if (controls) controls.hidden = available.length < 2;
+      dots.forEach(function (dot, i) {
+        var isVisible = isSlideVisible(slides[i]);
+        dot.hidden = !isVisible;
+        var position = available.indexOf(i);
+        if (position > -1) {
+          dot.setAttribute('aria-label', 'Show banner ' + (position + 1) + ' of ' + available.length);
+        }
+        var active = isVisible && i === activeIndex;
+        dot.classList.toggle('is-active', active);
+        if (active) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+    }
 
     function showSlide(index) {
-      activeIndex = ((index % slides.length) + slides.length) % slides.length;
+      var available = visibleIndices();
+      if (!available.length) {
+        carousel.hidden = true;
+        if (controls) controls.hidden = true;
+        return;
+      }
+      carousel.hidden = false;
+      // When the current slide does not exist at this breakpoint, start from
+      // the first slide that does.
+      var position = Math.max(0, available.indexOf(index));
+      activeIndex = available[position];
       slides.forEach(function (slide, i) {
         var active = i === activeIndex;
         slide.classList.toggle('is-active', active);
         slide.setAttribute('aria-hidden', active ? 'false' : 'true');
       });
-      dots.forEach(function (dot, i) {
-        var active = i === activeIndex;
-        dot.classList.toggle('is-active', active);
-        if (active) dot.setAttribute('aria-current', 'true');
-        else dot.removeAttribute('aria-current');
-      });
+      syncDots(available);
     }
 
     function stop() {
@@ -103,16 +168,45 @@
     // throttles a background tab, and never drifts like setInterval.
     function tick() {
       timer = null;
+      if (!carousel.isConnected) { stop(); return; }
       if (document.hidden) return;
-      showSlide(activeIndex + 1);
+      var available = visibleIndices();
+      if (available.length < 2) { start(); return; }
+      var position = available.indexOf(activeIndex);
+      if (position < 0) position = 0;
+      showSlide(available[(position + 1) % available.length]);
       start();
     }
 
     function start() {
       stop();
-      if (document.hidden) return;
+      if (document.hidden || !carousel.isConnected || visibleIndices().length < 2) return;
       timer = window.setTimeout(tick, INTERVAL);
     }
+
+    function onBreakpointChange() {
+      showSlide(activeIndex);
+      start();
+    }
+
+    function onVisibilityChange() {
+      if (document.hidden) stop();
+      else start();
+    }
+
+    function onFocus() { start(); }
+
+    function teardown() {
+      stop();
+      if (desktopQuery.removeEventListener) desktopQuery.removeEventListener('change', onBreakpointChange);
+      else if (desktopQuery.removeListener) desktopQuery.removeListener(onBreakpointChange);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pageshow', onFocus);
+      window.removeEventListener('focus', onFocus);
+    }
+
+    if (desktopQuery.addEventListener) desktopQuery.addEventListener('change', onBreakpointChange);
+    else if (desktopQuery.addListener) desktopQuery.addListener(onBreakpointChange);
 
     dots.forEach(function (dot) {
       dot.addEventListener('click', function () {
@@ -121,20 +215,37 @@
       });
     });
 
-    document.addEventListener('visibilitychange', function () {
-      if (document.hidden) stop();
-      else start();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pageshow', onFocus);
+    window.addEventListener('focus', onFocus);
+
+    showSlide(activeIndex);
+    slides.forEach(function (slide) {
+      slide.classList.remove('is-active-desktop', 'is-active-mobile');
     });
-    window.addEventListener('pageshow', function () { start(); });
-    window.addEventListener('focus', function () { start(); });
+    carousel.setAttribute('data-hero-ready', '');
 
     carousel.__zarnoorHero = {
       restart: start,
       stop: stop,
-      show: showSlide
+      show: showSlide,
+      destroy: teardown
     };
 
     start();
+  }
+
+  function init() {
+    document.querySelectorAll('[data-hero-carousel]').forEach(initCarousel);
+  }
+
+  function teardownSection(section) {
+    if (!section) return;
+    document.querySelectorAll('[data-hero-carousel]').forEach(function (carousel) {
+      if (!section.contains(carousel)) return;
+      if (carousel.__zarnoorHero && carousel.__zarnoorHero.destroy) carousel.__zarnoorHero.destroy();
+      delete carousel.__zarnoorHero;
+    });
   }
 
   if (document.readyState === 'loading') {
@@ -143,8 +254,11 @@
     init();
   }
 
-  // Theme editor: re-init when the section is re-rendered.
+  // Theme editor: tear the old controller down before Shopify swaps the section.
   document.addEventListener('shopify:section:load', init);
+  document.addEventListener('shopify:section:unload', function (event) {
+    teardownSection(event.target);
+  });
 })();
 </script>
 
@@ -157,8 +271,8 @@
       "type": "slide",
       "name": "Banner slide",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Banner image" },
-        { "type": "image_picker", "id": "mobile_image", "label": "Mobile banner image (optional)" },
+        { "type": "image_picker", "id": "image", "label": "Desktop banner image", "info": "Shown on desktop and tablet. Leave blank to hide this slide on desktop." },
+        { "type": "image_picker", "id": "mobile_image", "label": "Mobile banner image", "info": "Shown on phones only. Leave blank to reuse the desktop image." },
         { "type": "text", "id": "alt", "label": "Alt text", "default": "Zarnoor campaign" },
         { "type": "url", "id": "link", "label": "Link (optional)" }
       ]
