@@ -1,5 +1,5 @@
 {%- capture wa_number -%}{%- render 'whatsapp-number', wa_override: settings.whatsapp_number, wa_store: shop.phone -%}{%- endcapture -%}
-{%- assign wa_display = shop.phone | default: '+' | append: wa_number -%}
+{%- assign wa_display = '+' | append: wa_number -%}
 <footer class="site-footer">
   <div class="footer-container">
     <div class="footer-grid">
