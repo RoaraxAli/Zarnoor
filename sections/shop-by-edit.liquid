@@ -20,8 +20,9 @@
 
   <div class="edit-cards">
     {%- if has_real_blocks -%}
+      {%- comment -%} Cards added in the editor: order is whatever is dragged in the editor. {%- endcomment -%}
       {%- for block in section.blocks -%}
-        <a class="edit-card" href="{{ block.settings.link | default: routes.all_products_collection_url }}" {{ block.shopify_attributes }}>
+        <a class="edit-card" href="{{ block.settings.link | default: block.settings.collection.url | default: routes.all_products_collection_url }}" {{ block.shopify_attributes }}>
           {%- if block.settings.image != blank -%}
             <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}" loading="lazy" width="800" height="1200">
           {%- elsif block.settings.collection != blank -%}
@@ -40,37 +41,70 @@
       {%- endfor -%}
     {%- else -%}
       {%- comment -%}
-        Auto-list. Collections have no creation date in Liquid, so each one is
-        keyed by the created_at of its newest product and sorted newest-first.
+        Auto-list. "Collections to show first" is pinned in the typed order, then the
+        rest follow the chosen sort. Collections have no creation date in Liquid, so
+        "newest" keys each one by the created_at of its newest product.
       {%- endcomment -%}
-      {%- capture collection_keys -%}
+      {%- assign pinned = '' -%}
+      {%- assign pin_list = section.settings.pin_handles | split: ',' -%}
+      {%- for pin in pin_list -%}
+        {%- assign pin_handle = pin | strip | downcase -%}
+        {%- if pin_handle == blank -%}{%- continue -%}{%- endif -%}
+        {%- assign pin_needle = pin_handle | append: '~' -%}
+        {%- if pinned contains pin_needle -%}{%- continue -%}{%- endif -%}
+        {%- assign pinned = pinned | append: pin_needle -%}
+      {%- endfor -%}
+
+      {%- capture sort_keys -%}
         {%- for collection in collections -%}
           {%- if collection.handle == 'frontpage' or collection.all_products_count == 0 -%}{%- continue -%}{%- endif -%}
-          {%- assign newest_product = collection.products | sort: 'created_at' | last -%}
-          {{- newest_product.created_at | date: '%s' -}}|{{- collection.handle -}}~
+          {%- assign collection_needle = collection.handle | append: '~' -%}
+          {%- if pinned contains collection_needle -%}{%- continue -%}{%- endif -%}
+          {%- case section.settings.sort_by -%}
+            {%- when 'title_asc' or 'title_desc' -%}
+              {%- assign sort_key = collection.title | downcase -%}
+            {%- when 'most_products' -%}
+              {%- assign sort_key = collection.all_products_count | prepend: '000000' | slice: -6, 6 -%}
+            {%- else -%}
+              {%- assign newest_product = collection.products | sort: 'created_at' | last -%}
+              {%- assign sort_key = newest_product.created_at | date: '%s' -%}
+          {%- endcase -%}
+          {{- sort_key -}}|{{- collection.handle -}}~
         {%- endfor -%}
       {%- endcapture -%}
-      {%- assign collection_keys = collection_keys | split: '~' | sort | reverse -%}
+
+      {%- assign sort_keys = sort_keys | split: '~' -%}
+      {%- case section.settings.sort_by -%}
+        {%- when 'oldest' or 'title_asc' -%}
+          {%- assign sort_keys = sort_keys | sort -%}
+        {%- else -%}
+          {%- assign sort_keys = sort_keys | sort | reverse -%}
+      {%- endcase -%}
+
+      {%- assign ordered = pinned -%}
+      {%- for sort_key in sort_keys -%}
+        {%- assign key_handle = sort_key | split: '|' | last -%}
+        {%- if key_handle == blank -%}{%- continue -%}{%- endif -%}
+        {%- assign ordered = ordered | append: key_handle | append: '~' -%}
+      {%- endfor -%}
+
       {%- assign shown = 0 -%}
-      {%- for key in collection_keys -%}
+      {%- assign ordered_handles = ordered | split: '~' -%}
+      {%- for handle in ordered_handles -%}
+        {%- if handle == blank -%}{%- continue -%}{%- endif -%}
         {%- if shown >= section.settings.limit -%}{%- break -%}{%- endif -%}
-        {%- assign key_parts = key | split: '|' -%}
-        {%- assign wanted_handle = key_parts[1] -%}
-        {%- for collection in collections -%}
-          {%- if collection.handle != wanted_handle -%}{%- continue -%}{%- endif -%}
-          {%- if collection.all_products_count == 0 -%}{%- break -%}{%- endif -%}
-          {%- assign shown = shown | plus: 1 -%}
-          <a class="edit-card" href="{{ collection.url }}">
-            {%- if collection.image != blank -%}
-              <img src="{{ collection.image | image_url: width: 800 }}" alt="{{ collection.title | escape }}" loading="lazy" width="800" height="1200">
-            {%- elsif collection.products.first.featured_image -%}
-              <img src="{{ collection.products.first.featured_image | image_url: width: 800 }}" alt="{{ collection.title | escape }}" loading="lazy" width="800" height="1200">
-            {%- endif -%}
-            <span class="edit-card-title">{{ collection.title }}</span>
-            <span class="edit-card-cta">Shop {{ collection.title | downcase }} <b>→</b></span>
-          </a>
-          {%- break -%}
-        {%- endfor -%}
+        {%- assign card_collection = collections[handle] -%}
+        {%- if card_collection == blank or card_collection.all_products_count == 0 -%}{%- continue -%}{%- endif -%}
+        {%- assign shown = shown | plus: 1 -%}
+        <a class="edit-card" href="{{ card_collection.url }}">
+          {%- if card_collection.image != blank -%}
+            <img src="{{ card_collection.image | image_url: width: 800 }}" alt="{{ card_collection.title | escape }}" loading="lazy" width="800" height="1200">
+          {%- elsif card_collection.products.first.featured_image -%}
+            <img src="{{ card_collection.products.first.featured_image | image_url: width: 800 }}" alt="{{ card_collection.title | escape }}" loading="lazy" width="800" height="1200">
+          {%- endif -%}
+          <span class="edit-card-title">{{ card_collection.title }}</span>
+          <span class="edit-card-cta">Shop {{ card_collection.title | downcase }} <b>→</b></span>
+        </a>
       {%- endfor -%}
     {%- endif -%}
   </div>
@@ -84,7 +118,28 @@
     { "type": "text", "id": "title", "label": "Heading", "default": "Find your kind of beautiful." },
     { "type": "text", "id": "link_label", "label": "Header link label", "default": "All collections" },
     { "type": "url", "id": "link_url", "label": "Header link URL" },
-    { "type": "range", "id": "limit", "label": "Auto-list: collections to show", "info": "Newest collection (by its newest product) first. Cards added in the editor keep their own drag order.", "min": 2, "max": 6, "step": 1, "default": 3 }
+    { "type": "range", "id": "limit", "label": "Auto-list: collections to show", "min": 2, "max": 6, "step": 1, "default": 3 },
+    {
+      "type": "select",
+      "id": "sort_by",
+      "label": "Auto-list: sort order",
+      "options": [
+        { "value": "newest", "label": "Newest collection first" },
+        { "value": "oldest", "label": "Oldest collection first" },
+        { "value": "title_asc", "label": "Title A–Z" },
+        { "value": "title_desc", "label": "Title Z–A" },
+        { "value": "most_products", "label": "Most products first" }
+      ],
+      "default": "newest",
+      "info": "Only used when no category cards are added below."
+    },
+    {
+      "type": "text",
+      "id": "pin_handles",
+      "label": "Auto-list: collections to show first",
+      "default": "winter-collection",
+      "info": "Comma separated handles, in the order you want them. Example: winter-collection, royal-collection. Leave blank for no pinning."
+    }
   ],
   "blocks": [
     {
