@@ -1,22 +1,6 @@
 <div id="site-preloader" class="site-preloader" aria-hidden="true" role="presentation">
   <div class="preloader-inner">
-    {%- if settings.logo != blank -%}
-      <img
-        src="{{ settings.logo | image_url: width: 320 }}"
-        alt="{{ shop.name | escape }}"
-        class="preloader-logo"
-        width="{{ settings.logo.width }}"
-        height="{{ settings.logo.height }}"
-      >
-    {%- else -%}
-      <img
-        src="{{ 'zarnoor-wordmark.png' | asset_url }}"
-        alt="{{ shop.name | escape }}"
-        class="preloader-logo"
-        width="528"
-        height="134"
-      >
-    {%- endif -%}
+    {%- render 'logo-image', logo: settings.logo, alt: shop.name, class: 'preloader-logo', sizes: '180px', loading: 'eager' -%}
     <div class="preloader-line" aria-hidden="true"><span></span></div>
   </div>
 </div>

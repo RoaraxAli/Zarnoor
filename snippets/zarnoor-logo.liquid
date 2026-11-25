@@ -1,25 +1,7 @@
-{%- if settings.logo != blank -%}
-  <a href="{{ routes.root_url }}" class="brand-logo-link" aria-label="{{ shop.name | escape }}">
-    <img
-      src="{{ settings.logo | image_url: width: 480 }}"
-      srcset="{{ settings.logo | image_url: width: 240 }} 240w, {{ settings.logo | image_url: width: 480 }} 480w"
-      sizes="(max-width: 749px) 140px, 220px"
-      alt="{{ shop.name | escape }}"
-      class="brand-logo-img"
-      width="{{ settings.logo.width }}"
-      height="{{ settings.logo.height }}"
-      loading="eager"
-    >
-  </a>
-{%- else -%}
-  <a href="{{ routes.root_url }}" class="brand-logo-link" aria-label="{{ shop.name | escape }}">
-    <img
-      src="{{ 'zarnoor-wordmark.png' | asset_url }}"
-      alt="{{ shop.name | escape }}"
-      class="brand-logo-img"
-      width="528"
-      height="134"
-      loading="eager"
-    >
-  </a>
-{%- endif -%}
+{%- comment -%}
+  Linked brand mark. The image itself lives in snippets/logo-image.liquid so the
+  header, footer, drawer, preloader and 404 page can never drift apart.
+{%- endcomment -%}
+<a href="{{ routes.root_url }}" class="brand-logo-link" aria-label="{{ shop.name | escape }}">
+  {%- render 'logo-image', logo: settings.logo, alt: shop.name, class: 'brand-logo-img', sizes: sizes -%}
+</a>

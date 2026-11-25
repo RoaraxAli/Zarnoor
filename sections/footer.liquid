@@ -5,7 +5,7 @@
     <div class="footer-grid">
       <div class="footer-col footer-brand-col">
         <div class="footer-brand-logo-wrap">
-          {% render 'zarnoor-logo' %}
+          {% render 'zarnoor-logo', sizes: '(max-width: 749px) 70vw, 380px' %}
           {%- if section.settings.show_brand_social -%}
             {%- assign fb_url = section.settings.facebook_url | default: settings.facebook_url | default: 'https://www.facebook.com/profile.php?id=61590157529246' -%}
             {%- assign ig_url = section.settings.instagram_url | default: settings.instagram_url | default: 'https://www.instagram.com/zarnoorbyukash/' -%}

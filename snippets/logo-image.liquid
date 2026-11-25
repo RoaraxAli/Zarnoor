@@ -1,0 +1,41 @@
+{%- comment -%}
+  Single source for the brand mark.
+
+  Upload the logo once in Theme settings -> Brand -> Logo and it is used
+  everywhere (header, footer, preloader, 404). The bundled wordmark is only a
+  fallback for when no logo has been uploaded yet, so the store never renders
+  an empty square.
+
+  Params (all optional):
+    logo    - image object (pass settings.logo)
+    class   - CSS class for the img (default: brand-logo-img)
+    alt     - alt text (default: shop name)
+    sizes   - srcset sizes hint
+    loading - eager (default) or lazy
+{%- endcomment -%}
+{%- assign logo_image = logo | default: settings.logo -%}
+{%- assign logo_class = class | default: 'brand-logo-img' -%}
+{%- assign logo_alt = alt | default: shop.name -%}
+{%- assign logo_sizes = sizes | default: '(max-width: 749px) 140px, 220px' -%}
+{%- assign logo_loading = loading | default: 'eager' -%}
+{%- if logo_image != blank -%}
+  <img
+    src="{{ logo_image | image_url: width: 480 }}"
+    srcset="{{ logo_image | image_url: width: 240 }} 240w{% if logo_image.width >= 480 %}, {{ logo_image | image_url: width: 480 }} 480w{% endif %}{% if logo_image.width >= 720 %}, {{ logo_image | image_url: width: 720 }} 720w{% endif %}"
+    sizes="{{ logo_sizes }}"
+    alt="{{ logo_alt | escape }}"
+    class="{{ logo_class }}"
+    width="{{ logo_image.width }}"
+    height="{{ logo_image.height }}"
+    loading="{{ logo_loading }}"
+  >
+{%- else -%}
+  <img
+    src="{{ 'zarnoor-wordmark.png' | asset_url }}"
+    alt="{{ logo_alt | escape }}"
+    class="{{ logo_class }}"
+    width="528"
+    height="134"
+    loading="{{ logo_loading }}"
+  >
+{%- endif -%}
