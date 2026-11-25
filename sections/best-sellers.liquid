@@ -1,6 +1,22 @@
 {%- assign best_seller_collection = section.settings.collection | default: collections['all'] -%}
 {%- assign best_seller_tag = section.settings.tag | default: 'best-seller' | downcase | strip -%}
 {%- assign product_limit = section.settings.products_to_show | default: 4 -%}
+{%- assign product_sort = section.settings.sort_by | default: 'collection' -%}
+{%- assign best_seller_products = best_seller_collection.products -%}
+{%- case product_sort -%}
+  {%- when 'newest' -%}
+    {%- assign best_seller_products = best_seller_products | sort: 'created_at' | reverse -%}
+  {%- when 'oldest' -%}
+    {%- assign best_seller_products = best_seller_products | sort: 'created_at' -%}
+  {%- when 'title_asc' -%}
+    {%- assign best_seller_products = best_seller_products | sort: 'title' -%}
+  {%- when 'title_desc' -%}
+    {%- assign best_seller_products = best_seller_products | sort: 'title' | reverse -%}
+  {%- when 'price_asc' -%}
+    {%- assign best_seller_products = best_seller_products | sort: 'price' -%}
+  {%- when 'price_desc' -%}
+    {%- assign best_seller_products = best_seller_products | sort: 'price' | reverse -%}
+{%- endcase -%}
 
 <section id="best-sellers" class="section-products best-sellers-carousel" data-best-sellers-carousel>
   <div class="section-header">
@@ -25,8 +41,8 @@
 
   {%- assign rendered_count = 0 -%}
   <div class="best-sellers-track" data-best-sellers-track aria-label="Best selling products">
-    {%- paginate best_seller_collection.products by 250 -%}
-      {%- for product in best_seller_collection.products -%}
+    {%- paginate best_seller_products by 250 -%}
+      {%- for product in best_seller_products -%}
         {%- assign product_tag_match = false -%}
         {%- for product_tag in product.tags -%}
           {%- assign normalized_product_tag = product_tag | downcase | strip -%}
@@ -36,7 +52,7 @@
         {%- endfor -%}
         {%- if product_tag_match -%}
           {%- assign product_card_index = rendered_count | plus: 1 -%}
-          <div class="best-sellers-slide">{% render 'product-card', product: product, index: product_card_index %}</div>
+          <div class="best-sellers-slide" data-product-title="{{ product.title | escape }}" data-product-created="{{ product.created_at | date: '%s' }}" data-product-price="{{ product.price }}">{% render 'product-card', product: product, index: product_card_index %}</div>
           {%- assign rendered_count = rendered_count | plus: 1 -%}
           {%- if rendered_count >= product_limit -%}{%- break -%}{%- endif -%}
         {%- endif -%}
@@ -104,6 +120,21 @@
     { "type": "collection", "id": "collection", "label": "Product source collection", "info": "Leave blank to check all products." },
     { "type": "text", "id": "tag", "label": "Product tag", "default": "best-seller" },
     { "type": "range", "id": "products_to_show", "min": 2, "max": 8, "step": 2, "default": 8, "label": "Products to show" },
+    {
+      "type": "select",
+      "id": "sort_by",
+      "label": "Product sort order",
+      "options": [
+        { "value": "collection", "label": "Collection order (manual)" },
+        { "value": "newest", "label": "Newest first" },
+        { "value": "oldest", "label": "Oldest first" },
+        { "value": "title_asc", "label": "Title A–Z" },
+        { "value": "title_desc", "label": "Title Z–A" },
+        { "value": "price_asc", "label": "Price low to high" },
+        { "value": "price_desc", "label": "Price high to low" }
+      ],
+      "default": "collection"
+    },
     { "type": "checkbox", "id": "show_view_all", "label": "Show View all link", "default": true },
     { "type": "text", "id": "empty_heading", "label": "Empty state heading", "default": "Best sellers are coming soon" },
     { "type": "textarea", "id": "empty_text", "label": "Empty state text", "default": "Add the best-seller tag to products to feature them here." }

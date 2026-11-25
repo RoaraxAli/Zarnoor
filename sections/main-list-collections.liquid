@@ -4,12 +4,69 @@
       <span class="section-eyebrow">{{ section.settings.eyebrow | default: 'Collections' }}</span>
       <h1 class="section-title">{{ section.settings.title | default: 'Shop by Collection' }}</h1>
     </div>
+    {%- if section.settings.show_sort -%}
+      <label class="collection-list-sort">
+        <span>{{ section.settings.sort_label | default: 'Sort' }}</span>
+        <select data-collection-list-sort aria-label="Sort collections">
+          <option value="default">Default</option>
+          <option value="title_asc">A–Z</option>
+          <option value="title_desc">Z–A</option>
+          <option value="newest">Newest</option>
+          <option value="most_products">Most pieces</option>
+        </select>
+      </label>
+    {%- endif -%}
   </div>
 
-  <div class="collections-grid">
+  {%- assign pinned = '' -%}
+  {%- assign pin_list = section.settings.pin_handles | split: ',' -%}
+  {%- for pin in pin_list -%}
+    {%- assign pin_handle = pin | strip | downcase -%}
+    {%- if pin_handle == blank -%}{%- continue -%}{%- endif -%}
+    {%- assign pinned = pinned | append: pin_handle | append: '~' -%}
+  {%- endfor -%}
+
+  {%- capture sort_keys -%}
     {%- for collection in collections -%}
+      {%- if collection.handle == 'frontpage' or collection.all_products_count == 0 -%}{%- continue -%}{%- endif -%}
+      {%- assign collection_needle = collection.handle | append: '~' -%}
+      {%- if pinned contains collection_needle -%}{%- continue -%}{%- endif -%}
+      {%- case section.settings.sort_by -%}
+        {%- when 'title_asc' or 'title_desc' -%}
+          {%- assign sort_key = collection.title | downcase -%}
+        {%- when 'most_products' -%}
+          {%- assign sort_key = collection.all_products_count | prepend: '000000' | slice: -6, 6 -%}
+        {%- else -%}
+          {%- assign newest_product = collection.products | sort: 'created_at' | last -%}
+          {%- assign sort_key = newest_product.created_at | date: '%s' -%}
+      {%- endcase -%}
+      {{- sort_key -}}|{{- collection.handle -}}~
+    {%- endfor -%}
+  {%- endcapture -%}
+
+  {%- assign sort_keys = sort_keys | split: '~' -%}
+  {%- case section.settings.sort_by -%}
+    {%- when 'oldest' or 'title_asc' -%}
+      {%- assign sort_keys = sort_keys | sort -%}
+    {%- else -%}
+      {%- assign sort_keys = sort_keys | sort | reverse -%}
+  {%- endcase -%}
+
+  {%- assign ordered = pinned -%}
+  {%- for sort_key in sort_keys -%}
+    {%- assign key_handle = sort_key | split: '|' | last -%}
+    {%- if key_handle == blank -%}{%- continue -%}{%- endif -%}
+    {%- assign ordered = ordered | append: key_handle | append: '~' -%}
+  {%- endfor -%}
+  {%- assign ordered_handles = ordered | split: '~' -%}
+
+  <div class="collections-grid">
+    {%- for handle in ordered_handles -%}
+      {%- if handle == blank -%}{%- continue -%}{%- endif -%}
+      {%- assign collection = collections[handle] -%}
+      {%- if collection == blank or collection.all_products_count == 0 -%}{%- continue -%}{%- endif -%}
       {%- if collection.handle == 'frontpage' -%}{%- continue -%}{%- endif -%}
-      <a class="collection-card" href="{{ collection.url }}">
+      <a class="collection-card" href="{{ collection.url }}" data-index="{{ forloop.index0 }}" data-created="{{ collection.products.last.created_at | date: '%s' }}">
         {%- if collection.image != blank -%}
           <img src="{{ collection.image | image_url: width: 900 }}" alt="{{ collection.title | escape }}" width="{{ collection.image.width }}" height="{{ collection.image.height }}" loading="lazy">
         {%- elsif collection.products.first.featured_image -%}
@@ -22,12 +79,53 @@
   </div>
 </div>
 
+{%- if section.settings.show_sort -%}
+<script>
+  (() => {
+    const root = document.querySelector('.collection-wrap');
+    const select = root?.querySelector('[data-collection-list-sort]');
+    const grid = root?.querySelector('.collections-grid');
+    if (!root || !select || !grid) return;
+    const cards = Array.from(grid.children).map((el) => ({
+      el,
+      title: (el.querySelector('.collection-card-title')?.textContent || '').trim().toLowerCase(),
+      count: Number((el.querySelector('.collection-card-count')?.textContent || '').replace(/\D/g, '')) || 0
+    }));
+    select.addEventListener('change', () => {
+      const mode = select.value;
+      const sorted = [...cards];
+      if (mode === 'title_asc') sorted.sort((a, b) => a.title.localeCompare(b.title));
+      if (mode === 'title_desc') sorted.sort((a, b) => b.title.localeCompare(a.title));
+      if (mode === 'most_products') sorted.sort((a, b) => b.count - a.count);
+      if (mode === 'newest') sorted.sort((a, b) => b.el.dataset.created - a.el.dataset.created);
+      if (mode === 'default') sorted.sort((a, b) => Number(a.el.dataset.index) - Number(b.el.dataset.index));
+      sorted.forEach((card) => grid.appendChild(card.el));
+    });
+  })();
+</script>
+{%- endif -%}
+
 {% schema %}
 {
   "name": "Collections list",
   "settings": [
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Collections" },
-    { "type": "text", "id": "title", "label": "Title", "default": "Shop by Collection" }
+    { "type": "text", "id": "title", "label": "Title", "default": "Shop by Collection" },
+    {
+      "type": "select",
+      "id": "sort_by",
+      "label": "Sort order",
+      "options": [
+        { "value": "newest", "label": "Newest first" },
+        { "value": "oldest", "label": "Oldest first" },
+        { "value": "title_asc", "label": "Title A–Z" },
+        { "value": "title_desc", "label": "Title Z–A" },
+        { "value": "most_products", "label": "Most pieces first" }
+      ],
+      "default": "newest"
+    },
+    { "type": "text", "id": "pin_handles", "label": "Collections to show first", "default": "", "info": "Comma separated collection handles, in the order you want them. Example: winter-collection, royal-collection." },
+    { "type": "checkbox", "id": "show_sort", "label": "Show customer sort dropdown", "default": true }
   ]
 }
 {% endschema %}
