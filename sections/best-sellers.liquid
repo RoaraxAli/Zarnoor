@@ -2,6 +2,32 @@
 {%- assign best_seller_tag = section.settings.tag | default: 'best-seller' | downcase | strip -%}
 {%- assign product_limit = section.settings.products_to_show | default: 4 -%}
 {%- assign product_sort = section.settings.sort_by | default: 'collection' -%}
+{%- assign pinned = '' -%}
+{%- assign slot_1 = section.settings.slot_1 -%}
+{%- assign slot_2 = section.settings.slot_2 -%}
+{%- assign slot_3 = section.settings.slot_3 -%}
+{%- assign slot_4 = section.settings.slot_4 -%}
+{%- assign slot_5 = section.settings.slot_5 -%}
+{%- assign slot_6 = section.settings.slot_6 -%}
+{%- assign slot_7 = section.settings.slot_7 -%}
+{%- assign slot_8 = section.settings.slot_8 -%}
+{%- assign slot_handles = '' -%}
+{%- assign slot_1_handle = slot_1.handle | default: '' -%}
+{%- assign slot_2_handle = slot_2.handle | default: '' -%}
+{%- assign slot_3_handle = slot_3.handle | default: '' -%}
+{%- assign slot_4_handle = slot_4.handle | default: '' -%}
+{%- assign slot_5_handle = slot_5.handle | default: '' -%}
+{%- assign slot_6_handle = slot_6.handle | default: '' -%}
+{%- assign slot_7_handle = slot_7.handle | default: '' -%}
+{%- assign slot_8_handle = slot_8.handle | default: '' -%}
+{%- assign slot_list = '' | append: slot_1_handle | append: '~' | append: slot_2_handle | append: '~' | append: slot_3_handle | append: '~' | append: slot_4_handle | append: '~' | append: slot_5_handle | append: '~' | append: slot_6_handle | append: '~' | append: slot_7_handle | append: '~' | append: slot_8_handle | split: '~' -%}
+{%- for slot_handle in slot_list -%}
+  {%- assign slot_handle = slot_handle | downcase -%}
+  {%- if slot_handle == blank -%}{%- continue -%}{%- endif -%}
+  {%- assign slot_needle = slot_handle | append: '~' -%}
+  {%- if pinned contains slot_needle -%}{%- continue -%}{%- endif -%}
+  {%- assign pinned = pinned | append: slot_needle -%}
+{%- endfor -%}
 
 <section id="best-sellers" class="section-products best-sellers-carousel" data-best-sellers-carousel>
   <div class="section-header">
@@ -42,19 +68,45 @@
           {%- when 'price_desc' -%}
             {%- assign sorted_products = sorted_products | sort: 'price' | reverse -%}
         {%- endcase -%}
-        {%- for product in sorted_products -%}
-          {%- assign product_tag_match = false -%}
-          {%- for product_tag in product.tags -%}
-            {%- assign normalized_product_tag = product_tag | downcase | strip -%}
-            {%- if normalized_product_tag == best_seller_tag -%}
-              {%- assign product_tag_match = true -%}
+        {%- capture ordered_handles -%}
+          {%- for slot_handle in slot_list -%}
+            {%- if slot_handle != blank -%}{{ slot_handle | downcase }}~{%- endif -%}
+          {%- endfor -%}
+          {%- for product in sorted_products -%}
+            {%- assign product_tag_match = false -%}
+            {%- for product_tag in product.tags -%}
+              {%- assign normalized_product_tag = product_tag | downcase | strip -%}
+              {%- if normalized_product_tag == best_seller_tag -%}
+                {%- assign product_tag_match = true -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if product_tag_match -%}
+              {%- assign product_needle = product.handle | append: '~' -%}
+              {%- unless pinned contains product_needle -%}{{ product.handle }}~{%- endunless -%}
             {%- endif -%}
           {%- endfor -%}
-          {%- if product_tag_match -%}
+        {%- endcapture -%}
+        {%- capture final_order -%}
+          {%- assign seen_pins = '' -%}
+          {%- assign final_list = ordered_handles | split: '~' -%}
+          {%- for handle in final_list -%}
+            {%- assign handle_key = handle | downcase -%}
+            {%- if handle_key == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign handle_needle = handle_key | append: '~' -%}
+            {%- if seen_pins contains handle_needle -%}{%- continue -%}{%- endif -%}
+            {%- assign seen_pins = seen_pins | append: handle_needle -%}
+            {{- handle_key -}}~
+          {%- endfor -%}
+        {%- endcapture -%}
+        {%- assign final_handles = final_order | split: '~' -%}
+        {%- for handle in final_handles -%}
+          {%- if handle == blank -%}{%- continue -%}{%- endif -%}
+          {%- if rendered_count >= product_limit -%}{%- break -%}{%- endif -%}
+          {%- assign product = all_products[handle] -%}
+          {%- if product != blank -%}
             {%- assign product_card_index = rendered_count | plus: 1 -%}
             <div class="best-sellers-slide" data-product-title="{{ product.title | escape }}" data-product-created="{{ product.created_at | date: '%s' }}" data-product-price="{{ product.price }}">{% render 'product-card', product: product, index: product_card_index %}</div>
             {%- assign rendered_count = rendered_count | plus: 1 -%}
-            {%- if rendered_count >= product_limit -%}{%- break -%}{%- endif -%}
           {%- endif -%}
         {%- endfor -%}
     {%- endpaginate -%}
@@ -136,6 +188,14 @@
       "default": "collection"
     },
     { "type": "checkbox", "id": "show_view_all", "label": "Show View all link", "default": true },
+    { "type": "product", "id": "slot_1", "label": "Position 1 product", "info": "Pick a product to force it into that position. Leave blank to let the tag and sort order decide. Added products must carry the best-seller tag." },
+    { "type": "product", "id": "slot_2", "label": "Position 2 product" },
+    { "type": "product", "id": "slot_3", "label": "Position 3 product" },
+    { "type": "product", "id": "slot_4", "label": "Position 4 product" },
+    { "type": "product", "id": "slot_5", "label": "Position 5 product" },
+    { "type": "product", "id": "slot_6", "label": "Position 6 product" },
+    { "type": "product", "id": "slot_7", "label": "Position 7 product" },
+    { "type": "product", "id": "slot_8", "label": "Position 8 product" },
     { "type": "text", "id": "empty_heading", "label": "Empty state heading", "default": "Best sellers are coming soon" },
     { "type": "textarea", "id": "empty_text", "label": "Empty state text", "default": "Add the best-seller tag to products to feature them here." }
   ],
