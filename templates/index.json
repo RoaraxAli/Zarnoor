@@ -49,11 +49,12 @@
     "best_sellers": {
       "type": "best-sellers",
       "settings": {
-        "eyebrow": "Customer favourites",
+        "eyebrow": "",
         "title": "Best sellers",
         "collection": "best-seller",
         "tag": "best-seller",
         "products_to_show": 8,
+        "sort_by": "title_asc",
         "show_view_all": true,
         "empty_heading": "Best sellers are coming soon",
         "empty_text": "Add the best-seller tag to products to feature them here."
