@@ -11,6 +11,7 @@
     "name": "Brand",
     "settings": [
       { "type": "image_picker", "id": "logo", "label": "Logo (header, footer & preloader)", "info": "PNG with a transparent background works best. This single image is used in the header, footer, mobile menu, preloader and 404 page. Leave it empty to fall back to the built-in Zarnoor wordmark." },
+      { "type": "image_picker", "id": "favicon", "label": "Favicon (browser tab icon)", "info": "Upload a square PNG. A 32×32 or 64×64 image works best. Leave empty to use the built-in Zarnoor icon." },
       { "type": "range", "id": "logo_width", "min": 60, "max": 260, "step": 2, "unit": "px", "default": 116, "label": "Logo width" },
       { "type": "checkbox", "id": "logo_footer_white", "label": "Show the footer logo in white", "default": true, "info": "Turn this off if you upload a coloured logo and want its original colours in the dark footer." },
       { "type": "text", "id": "contact_email", "label": "Contact email", "default": "zarnoorbyukasha@gmail.com" },
