@@ -56,6 +56,14 @@
         "products_to_show": 8,
         "sort_by": "title_asc",
         "show_view_all": true,
+        "slot_1": "allure-black",
+        "slot_2": "imaan-red",
+        "slot_3": "",
+        "slot_4": "",
+        "slot_5": "",
+        "slot_6": "",
+        "slot_7": "",
+        "slot_8": "",
         "empty_heading": "Best sellers are coming soon",
         "empty_text": "Add the best-seller tag to products to feature them here."
       }
@@ -68,6 +76,12 @@
         "link_label": "All collections",
         "link_url": "",
         "limit": 3,
+        "slot_1": "",
+        "slot_2": "",
+        "slot_3": "",
+        "slot_4": "",
+        "slot_5": "",
+        "slot_6": "",
         "sort_by": "newest",
         "pin_handles": "winter-collection"
       }
