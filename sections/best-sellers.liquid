@@ -2,10 +2,6 @@
 {%- assign best_seller_tag = section.settings.tag | default: 'best-seller' | downcase | strip -%}
 {%- assign product_limit = section.settings.products_to_show | default: 4 -%}
 {%- assign product_sort = section.settings.sort_by | default: 'collection' -%}
-{%- assign has_manual_products = false -%}
-{%- for block in section.blocks -%}
-  {%- if block.settings.product != blank -%}{%- assign has_manual_products = true -%}{%- endif -%}
-{%- endfor -%}
 
 <section id="best-sellers" class="section-products best-sellers-carousel" data-best-sellers-carousel>
   <div class="section-header">
@@ -30,17 +26,7 @@
 
   {%- assign rendered_count = 0 -%}
   <div class="best-sellers-track" data-best-sellers-track aria-label="Best selling products">
-    {%- if has_manual_products -%}
-      {%- for block in section.blocks -%}
-        {%- if block.settings.product != blank -%}
-          {%- assign product = block.settings.product -%}
-          {%- assign product_card_index = rendered_count | plus: 1 -%}
-          <div class="best-sellers-slide" data-product-title="{{ product.title | escape }}" data-product-created="{{ product.created_at | date: '%s' }}" data-product-price="{{ product.price }}" {{ block.shopify_attributes }}>{% render 'product-card', product: product, index: product_card_index %}</div>
-          {%- assign rendered_count = rendered_count | plus: 1 -%}
-        {%- endif -%}
-      {%- endfor -%}
-    {%- else -%}
-      {%- paginate best_seller_collection.products by 250 -%}
+    {%- paginate best_seller_collection.products by 250 -%}
         {%- assign sorted_products = best_seller_collection.products -%}
         {%- case product_sort -%}
           {%- when 'newest' -%}
@@ -71,8 +57,7 @@
             {%- if rendered_count >= product_limit -%}{%- break -%}{%- endif -%}
           {%- endif -%}
         {%- endfor -%}
-      {%- endpaginate -%}
-    {%- endif -%}
+    {%- endpaginate -%}
   </div>
 
   {%- if rendered_count == 0 -%}
@@ -153,15 +138,6 @@
     { "type": "checkbox", "id": "show_view_all", "label": "Show View all link", "default": true },
     { "type": "text", "id": "empty_heading", "label": "Empty state heading", "default": "Best sellers are coming soon" },
     { "type": "textarea", "id": "empty_text", "label": "Empty state text", "default": "Add the best-seller tag to products to feature them here." }
-  ],
-  "blocks": [
-    {
-      "type": "product",
-      "name": "Product",
-      "settings": [
-        { "type": "product", "id": "product", "label": "Product", "info": "Drag this block up or down in the editor to change its position. Adding a product block switches this section to manual order and hides the tag-based list." }
-      ]
-    }
   ],
   "presets": [{ "name": "Best sellers" }]
 }
