@@ -19,11 +19,29 @@
   </div>
 
   {%- assign pinned = '' -%}
+  {%- assign slot_1_handle = section.settings.slot_1.handle | default: '' -%}
+  {%- assign slot_2_handle = section.settings.slot_2.handle | default: '' -%}
+  {%- assign slot_3_handle = section.settings.slot_3.handle | default: '' -%}
+  {%- assign slot_4_handle = section.settings.slot_4.handle | default: '' -%}
+  {%- assign slot_5_handle = section.settings.slot_5.handle | default: '' -%}
+  {%- assign slot_6_handle = section.settings.slot_6.handle | default: '' -%}
+  {%- assign slot_7_handle = section.settings.slot_7.handle | default: '' -%}
+  {%- assign slot_8_handle = section.settings.slot_8.handle | default: '' -%}
+  {%- assign slot_list = '' | append: slot_1_handle | append: '~' | append: slot_2_handle | append: '~' | append: slot_3_handle | append: '~' | append: slot_4_handle | append: '~' | append: slot_5_handle | append: '~' | append: slot_6_handle | append: '~' | append: slot_7_handle | append: '~' | append: slot_8_handle | split: '~' -%}
+  {%- for slot_handle in slot_list -%}
+    {%- assign slot_handle = slot_handle | downcase -%}
+    {%- if slot_handle == blank -%}{%- continue -%}{%- endif -%}
+    {%- assign slot_needle = slot_handle | append: '~' -%}
+    {%- if pinned contains slot_needle -%}{%- continue -%}{%- endif -%}
+    {%- assign pinned = pinned | append: slot_needle -%}
+  {%- endfor -%}
   {%- assign pin_list = section.settings.pin_handles | split: ',' -%}
   {%- for pin in pin_list -%}
     {%- assign pin_handle = pin | strip | downcase -%}
     {%- if pin_handle == blank -%}{%- continue -%}{%- endif -%}
-    {%- assign pinned = pinned | append: pin_handle | append: '~' -%}
+    {%- assign pin_needle = pin_handle | append: '~' -%}
+    {%- if pinned contains pin_needle -%}{%- continue -%}{%- endif -%}
+    {%- assign pinned = pinned | append: pin_needle -%}
   {%- endfor -%}
 
   {%- capture sort_keys -%}
@@ -125,6 +143,14 @@
       "default": "newest"
     },
     { "type": "text", "id": "pin_handles", "label": "Collections to show first", "default": "winter-collection", "info": "Comma separated collection handles, in the order you want them. Example: winter-collection, royal-collection." },
+    { "type": "collection", "id": "slot_1", "label": "Position 1 collection", "info": "Pick a collection to force it into that position. Leave blank to use the sort order above. Position picks run before the pin list." },
+    { "type": "collection", "id": "slot_2", "label": "Position 2 collection" },
+    { "type": "collection", "id": "slot_3", "label": "Position 3 collection" },
+    { "type": "collection", "id": "slot_4", "label": "Position 4 collection" },
+    { "type": "collection", "id": "slot_5", "label": "Position 5 collection" },
+    { "type": "collection", "id": "slot_6", "label": "Position 6 collection" },
+    { "type": "collection", "id": "slot_7", "label": "Position 7 collection" },
+    { "type": "collection", "id": "slot_8", "label": "Position 8 collection" },
     { "type": "checkbox", "id": "show_sort", "label": "Show customer sort dropdown", "default": true }
   ]
 }
