@@ -14,7 +14,7 @@
 
     <div class="favourite-reels-grid">
       {%- for block in section.blocks -%}
-        {%- assign reel_link = section.settings.instagram_url | default: settings.instagram_url | default: block.settings.link | default: block.settings.product.url -%}
+        {%- assign reel_link = section.settings.instagram_url | default: settings.instagram_url | default: block.settings.link | default: block.settings.product.url | default: 'https://www.instagram.com/zarnoorbyukash/' -%}
         {%- assign reel_label = block.settings.title | default: block.settings.product.title | default: "Zarnoor reel" -%}
         {%- if block.settings.video != blank or block.settings.video_url != blank or request.design_mode -%}
           {%- if reel_link != blank -%}<a class="favourite-reel" href="{{ reel_link }}" aria-label="{{ reel_label | escape }}" {{ block.shopify_attributes }}>{%- else -%}<div class="favourite-reel" {{ block.shopify_attributes }}>{%- endif -%}
