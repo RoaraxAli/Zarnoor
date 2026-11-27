@@ -114,9 +114,9 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/zarnoor-reel-4.mp4",
-            "video_url": "https://www.instagram.com/zarnoorbyukash/",
+            "video_url": "",
             "product": "",
-            "link": "",
+            "link": "https://www.instagram.com/zarnoorbyukash/",
             "title": ""
           }
         },
