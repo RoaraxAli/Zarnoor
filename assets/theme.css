@@ -863,12 +863,12 @@ input, select, textarea, button { border-radius: 8px; }
 .wishlist-btn.is-saved { color: var(--accent); }
 .wishlist-btn.is-saved svg { fill: currentColor; }
 
-.quick-add-overlay { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 0; }
+.quick-add-overlay { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 0; border-radius: 14px 14px 0 0; overflow: hidden; }
 .quick-action-row { display: flex; gap: 0; }
 .btn-quick-add,
 .btn-quick-view {
   flex: 1;
-  height: 42px;
+  height: 36px;
   background: rgba(255, 255, 255, .95);
   color: var(--ink);
   font-size: 9px;
