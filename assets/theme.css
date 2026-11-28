@@ -869,7 +869,7 @@ input, select, textarea, button { border-radius: 8px; }
 .btn-quick-view {
   flex: 1;
   height: 36px;
-  background: rgba(255, 255, 255, .95);
+  background: #ffffff;
   color: var(--ink);
   font-size: 9px;
   font-weight: 500;
